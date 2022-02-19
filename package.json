@@ -20,6 +20,7 @@
     "express": "^4.17.3",
     "helmet": "^5.0.2",
     "jsonwebtoken": "^8.5.1",
+    "sequelize": "^6.16.2",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
@@ -30,6 +31,7 @@
     "@types/helmet": "^4.0.0",
     "@types/jsonwebtoken": "^8.5.1",
     "@types/node": "^14.17.9",
+    "@types/sequelize": "^4.28.11",
     "@types/uuid": "^8.3.0",
     "@typescript-eslint/eslint-plugin": "^4.27.0",
     "@typescript-eslint/parser": "^4.27.0",
