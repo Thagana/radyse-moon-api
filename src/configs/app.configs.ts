@@ -7,7 +7,8 @@ const devConfigs = {
     MAIL_PASSWORD: process.env.MAIL_PASSWORD || '',
     NEW_ENDPOINT: process.env.NEWS_TOKEN || '',
     GOOGLE_OAUTH_SECRETE: process.env.GOOGLE_OAUTH_SECRETE || '',
-    GOOGLE_OAUTH_CLIENT_ID: process.env.GOOGLE_OAUTH_CLIENT_ID || ''
+    GOOGLE_OAUTH_CLIENT_ID: process.env.GOOGLE_OAUTH_CLIENT_ID || '',
+    APP_TOKEN: process.env.APP_TOKEN || ''
 }
 
 const prodConfigs = {
@@ -15,7 +16,8 @@ const prodConfigs = {
     MAIL_PASSWORD: process.env.MAIL_PASSWORD || '',
     NEW_ENDPOINT: process.env.NEWS_TOKEN || '',
     GOOGLE_OAUTH_SECRETE: process.env.GOOGLE_OAUTH_SECRETE || '',
-    GOOGLE_OAUTH_CLIENT_ID: process.env.GOOGLE_OAUTH_CLIENT_ID || ''
+    GOOGLE_OAUTH_CLIENT_ID: process.env.GOOGLE_OAUTH_CLIENT_ID || '',
+    APP_TOKEN: process.env.APP_TOKEN || ''
 }
 
 export const configs = process.env.NODE_ENV === 'production' ? prodConfigs : devConfigs;
