@@ -5,6 +5,7 @@ import User from "../../models/User";
 import jwt from "jsonwebtoken";
 import { configs } from "../../configs/app.configs";
 import SQ from "../../configs/db.connect";
+import NewsSettings from "../../models/NewsSettings";
 
 const login = async (request: Request, response: Response) => {
   const transactions = await SQ.transaction();
@@ -53,8 +54,16 @@ const login = async (request: Request, response: Response) => {
 
       const jwtToken = await jwt.sign(
         { id: newUser.id, googleToken: token },
-        configs.APP_TOKEN
+        configs.TOKEN_SECRET
       );
+      await NewsSettings.create({
+        user_id: newUser.id,
+        language: 'en',
+        location: 'ZA',
+        frequency: 3
+      }, {
+        transaction: transactions
+      })
       await transactions.commit();
       return response.status(201).json({
         success: true,
@@ -65,7 +74,7 @@ const login = async (request: Request, response: Response) => {
     // LOGIN
     const jwtToken = await jwt.sign(
       { id: user.id, googleToken: token },
-      configs.APP_TOKEN
+      configs.TOKEN_SECRET
     );
     await transactions.commit();
     return response.status(200).json({
