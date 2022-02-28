@@ -8,7 +8,8 @@ const devConfigs = {
     NEW_ENDPOINT: process.env.NEWS_TOKEN || '',
     GOOGLE_OAUTH_SECRETE: process.env.GOOGLE_OAUTH_SECRETE || '',
     GOOGLE_OAUTH_CLIENT_ID: process.env.GOOGLE_OAUTH_CLIENT_ID || '',
-    APP_TOKEN: process.env.APP_TOKEN || ''
+    TOKEN_SECRET: process.env.TOKEN_SECRET || '',
+    WEATHER_API_KEY: process.env.WEATHER_API_KEY || '',
 }
 
 const prodConfigs = {
@@ -17,7 +18,8 @@ const prodConfigs = {
     NEW_ENDPOINT: process.env.NEWS_TOKEN || '',
     GOOGLE_OAUTH_SECRETE: process.env.GOOGLE_OAUTH_SECRETE || '',
     GOOGLE_OAUTH_CLIENT_ID: process.env.GOOGLE_OAUTH_CLIENT_ID || '',
-    APP_TOKEN: process.env.APP_TOKEN || ''
+    TOKEN_SECRET: process.env.TOKEN_SECRET || '',
+    WEATHER_API_KEY: process.env.WEATHER_API_KEY || '',
 }
 
 export const configs = process.env.NODE_ENV === 'production' ? prodConfigs : devConfigs;
