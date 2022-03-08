@@ -1,58 +1,33 @@
 import { Request, Response } from "express";
-import { configs } from "../../configs/app.configs";
-
-import axios from "axios";
+import fetchNews from "../../service/newsService";
 import logger from "../../utils/logger";
+import validate from '../../helpers/validateCategory';
 
-const fetchNews = async (country: string) => {
+const headlines = async (request: Request | any, response: Response): Promise<Response> => {
   try {
-    const response = await axios.get(
-      `https://newsapi.org/v2/top-headlines?country=${country}&apiKey=${configs.NEW_ENDPOINT}`
-    );
-    if (response.status === 200) {
-      const data = response.data;
-      const articles = data.articles;
-      return {
-        success: true,
-        data: articles,
-      };
-    }
-    return {
-      success: false,
-    };
-  } catch (error) {
-    logger.error((error as Error).stack || error);
-    return {
-      success: false,
-    };
-  }
-};
-
-const headlines = async (request: Request, response: Response) => {
-  try {
-    const { countryISO } = request.body;
-    let country = "";
+    const id = request?.user?.id
     
-    if (countryISO) {
-      country = countryISO.toLowerCase();
+    if (!id) {
+      return response.status(400).json({
+        success: false,
+        message: 'Unauthorized'
+      })
     }
-
-    if (!countryISO) {
-      country = "za";
-    }
-
-    const data = await fetchNews(country);
+ 
+    const data = await fetchNews(id);
 
     if (!data.success) {
       return response.status(400).json({
         success: false,
+        data: data.data
       });
     }
     return response.status(200).json({
       success: true,
-      data: data.data,
+      data: data
     });
   } catch (error) {
+    logger.error((error as Error).stack || error);
     return response.status(400).json({
       success: false,
       message: "Something went wrong, please try again",
