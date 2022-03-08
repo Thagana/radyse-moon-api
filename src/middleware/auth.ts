@@ -20,6 +20,7 @@ const tokenRequired = (request: Request, response: Response, next: NextFunction)
         .status(403)  
         .json({ success: false, message: 'Access denied' });
     }
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     request.user = user;
     return next();

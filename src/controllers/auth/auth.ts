@@ -1,13 +1,13 @@
 import { Request, Response } from "express";
 import logger from "../../utils/logger";
 import axios from "axios";
-import User from "../../models/User";
+import User from "../../models/SQL/User";
 import jwt from "jsonwebtoken";
 import { configs } from "../../configs/app.configs";
 import SQ from "../../configs/db.connect";
-import NewsSettings from "../../models/NewsSettings";
+import NewsSettings from "../../models/SQL/NewsSettings";
 
-const login = async (request: Request, response: Response) => {
+const login = async (request: Request, response: Response): Promise<Response> => {
   const transactions = await SQ.transaction();
   try {
     const { token } = request.body;
@@ -60,7 +60,9 @@ const login = async (request: Request, response: Response) => {
         user_id: newUser.id,
         language: 'en',
         location: 'ZA',
-        frequency: 3
+        frequency: 3,
+        category: 'general',
+        push_enabled: 0
       }, {
         transaction: transactions
       })

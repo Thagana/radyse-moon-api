@@ -1,5 +1,5 @@
 import { Model, DataTypes, Optional } from "sequelize";
-import db from "../configs/db.connect";
+import db from "../../configs/db.connect";
 
 interface WeatherLocationAttributes {
   id: number;

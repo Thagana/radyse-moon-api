@@ -4,7 +4,7 @@ import headlines from "./news";
 import profile from './profile';
 
 const Routes = (app: Express) => {
-  app.use("/", headlines);
+  app.use("/news", headlines);
   app.use('/auth', auth);
   app.use('/user', profile);
 };
