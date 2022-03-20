@@ -1,12 +1,9 @@
 import { Sequelize } from "sequelize";
 import configs from "./db.configs";
 
-const { DB_HOST, DB_NAME, DB_PASSWORD, DB_PORT, DB_USER_NAME, DIALECT } =
-  configs;
+const { DATABASE_CONNECTION } = configs;
 
-const db = new Sequelize(
-  `${DIALECT}://${DB_USER_NAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}`
-);
+const db = new Sequelize(DATABASE_CONNECTION);
 
 export const SQ = db;
 
