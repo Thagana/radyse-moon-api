@@ -21,7 +21,8 @@ const getNews = async (category: string, country: string) => {
     const news = await ArticleModel.find({
       category: category,
       country: countryISO
-    });
+    }).sort({ dateCreated: -1}).exec();
+
     const mapper: DataFormat[] = news.map((item) => ({
         id: item.id,
         title: item.title,
@@ -34,7 +35,7 @@ const getNews = async (category: string, country: string) => {
         description: item.description,
         publishedAt: item.publishedAt,
         country: item.country
-    }))
+    }));
     return {
       success: true,
       data: mapper,

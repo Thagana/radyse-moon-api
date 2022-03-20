@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import fetchNews from "../../service/newsService";
 import logger from "../../utils/logger";
-import validate from '../../helpers/validateCategory';
 import axios from 'axios';
 import { configs } from "../../configs/app.configs";
 const headlines = async (request: Request | any, response: Response): Promise<Response> => {

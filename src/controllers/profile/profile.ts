@@ -76,6 +76,7 @@ const getSettings = async (
       },
     });
   } catch (error) {
+    logger.error(error);
     return response.status(400).json({
       success: false,
       message: "Something went wrong, please try again",
@@ -193,8 +194,9 @@ const setUserLocation = async (
 const updateSettings = async (request: Request | any, response: Response) => {
   try {
     const id = request.user.id;
-    const { type, token } = request.body;
-
+    let { type, token } = request.body;
+    token = String(token);
+    console.log('HERE', token, typeof token);
     if (!id) {
       return response.status(400).json({
         success: false,

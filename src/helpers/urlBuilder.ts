@@ -1,5 +1,4 @@
 import { configs } from "../configs/app.configs"
-import NewsSettings from "../models/SQL/NewsSettings";
 import logger from "../utils/logger";
 
 const urlBuilder = async (location: string, category: string): Promise<{ success: true, url: string } | { success: false, url?: string }> => {

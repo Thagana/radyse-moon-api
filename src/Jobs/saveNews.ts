@@ -5,6 +5,9 @@ import urlBuilder from "../helpers/urlBuilder";
 import insertIntoDB from "../helpers/insertIntoDB";
 import NewsSettings from "../models/SQL/NewsSettings";
 import cron from 'node-cron';
+import PushTokens from '../models/SQL/PushTokens';
+import sendPushNotification from '../helpers/sendPushNotification';
+
 
 interface ArticleResponse {
   source: {
@@ -33,7 +36,7 @@ interface DataFormat {
   category: string;
 }
 
-const saveNews = async (userId: number) => {
+const saveNews = async (userId: number): Promise<{ success: boolean }> => {
   try {
     const settings = await NewsSettings.findOne({
       where: {
@@ -76,27 +79,48 @@ const saveNews = async (userId: number) => {
       });
 
       await insertIntoDB(dateFormat);
+      return {
+        success: true,
+      }
+    }
+    return {
+      success: false
     }
   } catch (error) {
-    logger.error(error);
+    logger.error((error as Error).stack);
+    return {
+      success: false
+    }
   }
 };
 
 const saveNewsCron = cron.schedule('0 */6 * * *', async () => {
-  const users = await NewsSettings.findAll({
+  const settings = await NewsSettings.findAll({
     where: {
       push_enabled: 1
     }
   });
-  const results = [];
-  for (let i = 0; i < users.length; i++) {
-    const saved = saveNews(users[i].user_id);
-    results.push(saved);
+
+  for (let i = 0; i < settings.length; i++) {
+    const saved = await saveNews(settings[i].user_id);
+    if (saved.success) {
+      // Send Push Notification
+      const token = await PushTokens.findOne({
+        where: {
+          user_id: settings[i].user_id
+        }
+      })
+      if (token) {
+        await sendPushNotification(token.token);
+        logger.info('PUSH SENT ...');
+      } else {
+        logger.info('PUSH NOT SENT [TOKEN_NOT_FOUND] ...');
+      }
+    } else {
+      logger.info('PUSH NOT SENT [FAILED_TO_SAVE]...');
+    }
   }
 
-  const data = await Promise.all(results);
-  // TODO: send push notification with fetch news results
-  console.log('Cron run with all these results', data);
 })
 
 export default saveNewsCron;
