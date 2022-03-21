@@ -10,6 +10,7 @@ const devConfigs = {
     GOOGLE_OAUTH_CLIENT_ID: process.env.GOOGLE_OAUTH_CLIENT_ID || '',
     TOKEN_SECRET: process.env.TOKEN_SECRET || '',
     WEATHER_API_KEY: process.env.WEATHER_API_KEY || '',
+    MAIL_HOST: process.env.MAIL_HOST || ''
 }
 
 const prodConfigs = {
@@ -20,6 +21,7 @@ const prodConfigs = {
     GOOGLE_OAUTH_CLIENT_ID: process.env.GOOGLE_OAUTH_CLIENT_ID || '',
     TOKEN_SECRET: process.env.TOKEN_SECRET || '',
     WEATHER_API_KEY: process.env.WEATHER_API_KEY || '',
+    MAIL_HOST: process.env.MAIL_HOST || ''
 }
 
 export const configs = process.env.NODE_ENV === 'production' ? prodConfigs : devConfigs;

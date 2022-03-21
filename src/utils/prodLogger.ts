@@ -13,7 +13,7 @@ function buildProdLogger() {
 			new transports.Mail({
 			  to: configs.MAIL_USER_NAME,
 			  from: configs.MAIL_USER_NAME,
-			  host: 'smtp.gmail.com',
+			  host: configs.MAIL_HOST,
 			  post: 587,
 			  ssl: true,
 			  username: configs.MAIL_USER_NAME,
