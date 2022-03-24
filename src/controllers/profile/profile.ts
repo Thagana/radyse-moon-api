@@ -1,40 +1,25 @@
 import { Request, Response } from "express";
-import NewsSettings from "../../models/SQL/NewsSettings";
-import WeatherLocation from "../../models/SQL/WeatherLocation";
+import NewsSettings from "../../models/Mongodb/NewsSettings";
+import WeatherLocation from "../../models/Mongodb/WeatherLocation";
 import fetchWeather from "../../Jobs/fetchWeather";
 import logger from "../../utils/logger";
-import Tokens from "../../models/SQL/PushTokens";
+import Tokens from "../../models/Mongodb/PushTokens";
 
-const pushNotificationService = async (userId: number, token: string) => {
+const pushNotificationService = async (userId: string, token: string) => {
   try {
     const tokens = await Tokens.findOne({
-      where: {
         user_id: userId,
-      },
-    });
+    }).exec();
+
     if (!tokens) {
       await Tokens.create({
         user_id: userId,
         token: token,
       });
     }
-    await Tokens.update(
-      {
-        token: token,
-      },
-      {
-        where: {
-          user_id: userId,
-        },
-      }
-    );
-    await NewsSettings.update({
-        push_enabled: 1
-    }, {
-        where: {
-            user_id: userId
-        }
-    })
+    await Tokens.findOneAndUpdate({ token: token }, { user_id: userId });
+    await NewsSettings.findOneAndUpdate({ push_enabled: 1 }, { user_id: userId });
+
   } catch (error) {
     logger.error(error);
   }
@@ -52,13 +37,11 @@ const getSettings = async (
         message: "Access denied",
       });
     }
-    const userId = Number(id);
+    const userId = id;
 
     const settings = await NewsSettings.findOne({
-      where: {
         user_id: userId,
-      },
-    });
+    }).exec();
 
     if (!settings) {
       return response.status(200).json({
@@ -76,7 +59,7 @@ const getSettings = async (
       },
     });
   } catch (error) {
-    logger.error(error);
+    logger.error((error as Error).stack || error);
     return response.status(400).json({
       success: false,
       message: "Something went wrong, please try again",
@@ -90,15 +73,13 @@ const userWeather = async (request: Request | any, response: Response) => {
     if (!id) {
       return response.status(400).json({
         success: false,
-        message: "Access denied",
+        message: "CANNOT_LOAD_LOCATION",
       });
     }
     const userId = Number(id);
     const weather = await WeatherLocation.findOne({
-      where: {
         user_id: userId,
-      },
-    });
+    }).exec();
     if (!weather) {
       return response.status(200).json({
         success: false,
@@ -120,6 +101,7 @@ const userWeather = async (request: Request | any, response: Response) => {
       data: weatherFetch,
     });
   } catch (error) {
+    logger.error((error as Error).stack || error);
     return response.status(400).json({
       success: false,
       message: "Something went wrong, please try again",
@@ -133,7 +115,7 @@ const setUserLocation = async (
 ): Promise<Response> => {
   try {
     const id = request?.user?.id;
-    let { latitude, longitude } = request.body;
+    const { latitude, longitude } = request.body;
     if (!id) {
       return response.status(400).json({
         success: false,
@@ -148,22 +130,16 @@ const setUserLocation = async (
       });
     }
 
-    latitude = Number(latitude);
-    longitude = Number(longitude);
-
-    const userId = Number(id);
+    const userId = id;
     const hasWeather = await WeatherLocation.findOne({
-      where: {
         user_id: userId,
-      },
-    });
+    }).exec();
+
     if (hasWeather) {
-      await WeatherLocation.update(
+      await WeatherLocation.findOneAndUpdate(
         { latitude, longitude },
         {
-          where: {
             user_id: userId,
-          },
         }
       );
       const weather = await fetchWeather(latitude, longitude);
@@ -196,7 +172,6 @@ const updateSettings = async (request: Request | any, response: Response) => {
     const id = request.user.id;
     let { type, token } = request.body;
     token = String(token);
-    console.log('HERE', token, typeof token);
     if (!id) {
       return response.status(400).json({
         success: false,

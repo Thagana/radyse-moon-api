@@ -1,20 +1,7 @@
-import axios from "axios";
 import logger from "../utils/logger";
-import NewsSettings from '../models/SQL/NewsSettings';
+import NewsSettings from '../models/Mongodb/NewsSettings';
 import getNews from "../helpers/getNews";
 
-interface ArticleResponse {
-  source: {
-    id: string | null;
-    name: string;
-  };
-  title: string;
-  author: string;
-  description: string;
-  url: string;
-  urlToImage: string;
-  publishedAt: string;
-}
 
 interface DataFormat {
   id: string;
@@ -30,16 +17,15 @@ interface DataFormat {
   country: string;
 }
 
-const fetchNews = async (userId: number): Promise<{
+const fetchNews = async (userId: string): Promise<{
   success: boolean;
   data?: DataFormat[];
 }> => {
   try {
     const settings = await NewsSettings.findOne({
-      where: {
         user_id: userId
-      }
-    });
+    }).exec();
+    
     if (!settings) {
       return {
         success: false

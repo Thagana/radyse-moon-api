@@ -3,6 +3,7 @@ import fetchNews from "../../service/newsService";
 import logger from "../../utils/logger";
 import axios from 'axios';
 import { configs } from "../../configs/app.configs";
+
 const headlines = async (request: Request | any, response: Response): Promise<Response> => {
   try {
     const id = request?.user?.id

@@ -3,9 +3,9 @@ import axios from "axios";
 import { v4 } from "uuid";
 import urlBuilder from "../helpers/urlBuilder";
 import insertIntoDB from "../helpers/insertIntoDB";
-import NewsSettings from "../models/SQL/NewsSettings";
+import NewsSettings from "../models/Mongodb/NewsSettings";
 import cron from 'node-cron';
-import PushTokens from '../models/SQL/PushTokens';
+import PushTokens from '../models/Mongodb/PushTokens';
 import sendPushNotification from '../helpers/sendPushNotification';
 
 
@@ -36,13 +36,12 @@ interface DataFormat {
   category: string;
 }
 
-const saveNews = async (userId: number): Promise<{ success: boolean }> => {
+const saveNews = async (userId: string): Promise<{ success: boolean }> => {
   try {
     const settings = await NewsSettings.findOne({
-      where: {
         user_id: userId,
-      },
-    });
+    }).exec();
+
     if (!settings) {
       return {
         success: false,
@@ -95,10 +94,8 @@ const saveNews = async (userId: number): Promise<{ success: boolean }> => {
 };
 
 const saveNewsCron = cron.schedule('0 */6 * * *', async () => {
-  const settings = await NewsSettings.findAll({
-    where: {
+  const settings = await NewsSettings.find({
       push_enabled: 1
-    }
   });
 
   for (let i = 0; i < settings.length; i++) {
@@ -106,10 +103,9 @@ const saveNewsCron = cron.schedule('0 */6 * * *', async () => {
     if (saved.success) {
       // Send Push Notification
       const token = await PushTokens.findOne({
-        where: {
           user_id: settings[i].user_id
-        }
-      })
+      }).exec()
+      
       if (token) {
         await sendPushNotification(token.token);
         logger.info('PUSH SENT ...');
