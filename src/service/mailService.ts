@@ -30,8 +30,8 @@ class sendMail {
         subject: "verify account",
         html: `<html>
                         <div>
-                            <div>Welcome to Sleepy bears click on the link to active your account<div>
-                            <div>Click here: ${this.token}</div>
+                            <div>Welcome to The Ultimate News user the OTP code to verify access<div>
+                            <div>here: ${this.token}</div>
                             <div>If you did not make this request please ignore</div>
                         </div>
               </html>`,

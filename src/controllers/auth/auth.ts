@@ -1,16 +1,16 @@
 import { Request, Response } from "express";
 import logger from "../../utils/logger";
 import User from "../../models/Mongodb/Users";
-import jwt from "jsonwebtoken";
+import jwt, { VerifyOptions } from "jsonwebtoken";
 import { configs } from "../../configs/app.configs";
 import NewsSettings from "../../models/Mongodb/NewsSettings";
 import Mail from '../../service/mailService';
-import { v4 } from 'uuid';
+
 
 const login = async (request: Request, response: Response): Promise<Response> => {
   try {
-    const { token } = request.body;
-    if (!token) {
+    const { code } = request.body;
+    if (!code) {
       return response.status(400).json({
         success: false,
         message: "Token/Link required",
@@ -18,7 +18,7 @@ const login = async (request: Request, response: Response): Promise<Response> =>
     }
 
     const user = await User.findOne({
-        token,
+        code,
     }).exec();
 
     if (!user) {
@@ -35,7 +35,7 @@ const login = async (request: Request, response: Response): Promise<Response> =>
     );
     return response.status(200).json({
       success: true,
-      data: jwtToken,
+      token: jwtToken,
     });
   } catch (error) {
     logger.error((error as Error).stack || error);
@@ -89,7 +89,7 @@ const register = async (request: Request, response: Response) => {
     if (!sendMail) {
       return response.status(400).json()
     }
-    return response.status(201).json({
+    return response.status(200).json({
       success: true,
       message: 'Successfully registered please check email',
     });
@@ -98,7 +98,10 @@ const register = async (request: Request, response: Response) => {
   const sendMail = await mailer.send();
 
   if (!sendMail) {
-    return response.status(400).json()
+    return response.status(400).json({
+      success: false,
+      message: 'Something went wrong please try again later'
+    })
   }
   return response.status(200).json({
     success: true,
@@ -114,4 +117,38 @@ const register = async (request: Request, response: Response) => {
   }
 }
 
-export default { login, register };
+const verifyToken = async (request: Request, response: Response) => {
+  try {
+      const { token } = request.body;
+      if (!token) {
+        return response.status(400).json({
+          success: false,
+          message: 'Not token found'
+        })
+      }
+      const secret: string  = process.env.TOKEN_SECRET || "";
+      let access = true;
+
+      jwt.verify(token, secret, (error: any, user: any) => {
+        if (error) {
+          logger.error((error as Error).stack || error);
+          access = false;
+        }
+      })
+      
+      if (!access) {
+        return response.status(403).json({ success: false, message: 'Access denied' });
+      }
+
+      return response.status(200).json({success: true })
+
+  } catch (error) {
+    logger.error((error as Error).stack || error);
+    return response.status(400).json({
+      success: false,
+      message: "Something went wrong",
+    }); 
+  }
+}
+
+export default { login, register, verifyToken };
