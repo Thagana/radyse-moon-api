@@ -17,7 +17,7 @@ interface DataFormat {
   country: string;
 }
 
-const fetchNews = async (userId: string): Promise<{
+const fetchNews = async (userId: string, page: number, size: number): Promise<{
   success: boolean;
   data?: DataFormat[];
 }> => {
@@ -34,7 +34,7 @@ const fetchNews = async (userId: string): Promise<{
     const category = settings.category;
     const location = settings.location;
 
-    const news = await getNews(category, location);
+    const news = await getNews(category, location, page, size);
     
     if (!news.success) {
       return {
