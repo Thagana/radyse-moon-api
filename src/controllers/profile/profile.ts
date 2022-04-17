@@ -4,6 +4,9 @@ import WeatherLocation from "../../models/Mongodb/WeatherLocation";
 import fetchWeather from "../../Jobs/fetchWeather";
 import logger from "../../utils/logger";
 import Tokens from "../../models/Mongodb/PushTokens";
+import UserModel from "../../models/Mongodb/Users";
+import updateUserDetails from '../../helpers/updateUserDetails';
+
 
 const pushNotificationService = async (userId: string, token: string) => {
   try {
@@ -49,6 +52,9 @@ const getSettings = async (
         message: "could not find settings",
       });
     }
+    const user = await UserModel.findOne({
+      id: userId
+    })
     return response.status(200).json({
       success: true,
       data: {
@@ -56,6 +62,7 @@ const getSettings = async (
         language: settings.language,
         frequency: settings.frequency,
         pushState: settings.push_enabled,
+        name: user?.first_name + ' ' + user?.last_name
       },
     });
   } catch (error) {
@@ -198,4 +205,45 @@ const updateSettings = async (request: Request | any, response: Response) => {
   }
 };
 
-export default { getSettings, userWeather, setUserLocation, updateSettings };
+const updateUserSettings = async (request: Request, response: Response) => {
+  try {
+    // @ts-ignore
+    const id = request.user.id;
+    const { type, firstName, lastName } = request.body;
+
+    if (!id) {
+      return response.status(400).json({
+        success: false,
+        message: "Access denied",
+      });
+    }
+
+    let success = false;
+    switch (type) {
+      case 'SET_NAME':
+        success = await updateUserDetails(firstName, lastName, id);
+        break;
+      default:
+        break;
+    }
+    if (!success) {
+      return response.status(400).json({
+        success: false,
+        message: "Failed to update record",
+      });      
+    }
+    return response.status(200).json({
+      success: true,
+      message: "Successfully update record",
+    });
+
+  } catch (error) {
+    logger.error(error);
+    return response.status(400).json({
+      success: false,
+      message: "Something went wrong, please try again",
+    });
+  }
+}
+
+export default { getSettings, userWeather, setUserLocation, updateSettings, updateUserSettings };
