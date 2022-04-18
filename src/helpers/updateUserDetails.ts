@@ -1,0 +1,16 @@
+import UserModel from "../models/Mongodb/Users";
+
+const updateUserDetails = async (firstName: string, lastName: string, id: string) => {
+    try {
+        await UserModel.findOne({ _id: id  }).update({
+            first_name: firstName,
+            last_name: lastName
+        })
+        return true
+    } catch (error) {
+        console.log(error);
+        return false;
+    }
+}
+
+export default updateUserDetails

@@ -81,7 +81,8 @@ const register = async (request: Request, response: Response) => {
       location: 'ZA',
       frequency: 3,
       category: 'general',
-      push_enabled: 0
+      push_enabled: 0,
+      email_notification: 0,
     })
     const mailer = new Mail('User', email, token);
     const sendMail = await mailer.send();

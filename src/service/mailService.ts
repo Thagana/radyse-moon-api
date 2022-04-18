@@ -71,6 +71,34 @@ class sendMail {
       return false
     }
   }
+  static async sendMailingUpdate(email: string) {
+    try {
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: configs.MAIL_USER_NAME,
+          pass: configs.MAIL_PASSWORD,
+        },
+      });
+      const data = {
+        from: configs.MAIL_USER_NAME,
+        to: 'service@theultimatenews.xyz',
+        subject: `Update Mailing list`,
+        html: `<html>
+                        <div>
+                            <div>Update Mail List</div>
+                            <div>
+                              Email: ${email}
+                            </div>
+                        </div>
+              </html>`,
+      };
+      await transporter.sendMail(data);
+      return true
+    } catch (error) {
+      return false;
+    }
+  }
 }
 
 export default sendMail;
