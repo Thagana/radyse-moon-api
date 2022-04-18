@@ -6,6 +6,7 @@ import logger from "../../utils/logger";
 import Tokens from "../../models/Mongodb/PushTokens";
 import UserModel from "../../models/Mongodb/Users";
 import updateUserDetails from '../../helpers/updateUserDetails';
+import updateEmailNotification from '../../helpers/updateEmailNotification';
 
 
 const pushNotificationService = async (userId: string, token: string) => {
@@ -29,10 +30,11 @@ const pushNotificationService = async (userId: string, token: string) => {
 };
 
 const getSettings = async (
-  request: Request | any,
+  request: Request,
   response: Response
 ): Promise<Response> => {
   try {
+    // @ts-ignore
     const id = request?.user?.id;
     if (!id) {
       return response.status(400).json({
@@ -62,7 +64,8 @@ const getSettings = async (
         language: settings.language,
         frequency: settings.frequency,
         pushState: settings.push_enabled,
-        name: user?.first_name + ' ' + user?.last_name
+        name: user?.first_name + ' ' + user?.last_name,
+        email_notification: settings.email_notification
       },
     });
   } catch (error) {
@@ -209,7 +212,7 @@ const updateUserSettings = async (request: Request, response: Response) => {
   try {
     // @ts-ignore
     const id = request.user.id;
-    const { type, firstName, lastName } = request.body;
+    const { type, firstName, lastName, state } = request.body;
 
     if (!id) {
       return response.status(400).json({
@@ -223,6 +226,8 @@ const updateUserSettings = async (request: Request, response: Response) => {
       case 'SET_NAME':
         success = await updateUserDetails(firstName, lastName, id);
         break;
+      case 'SET_EMAIL_NOTIFICATION':
+        success = await updateEmailNotification(id, state);
       default:
         break;
     }
