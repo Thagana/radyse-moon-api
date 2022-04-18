@@ -14,7 +14,7 @@ const tokenRequired = (request: Request, response: Response, next: NextFunction)
   }
 
   jwt.verify(token, secret, (err, user) => {
-    if (err){
+    if (err) {
       console.log(err)
       return response
         .status(403)  
