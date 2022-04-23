@@ -112,7 +112,7 @@ const saveNewsCron = cron.schedule("0 0 * * *", async () => {
 
           if (settings[i].push_enabled) {
             if (token) {
-              await sendPushNotification(token.token);
+              await sendPushNotification(token.token, saved.data);
               logger.info("PUSH SENT ...");
             } else {
               logger.info("PUSH NOT SENT [TOKEN_NOT_FOUND] ...");
