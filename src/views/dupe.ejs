@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html
+  lang="en"
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:o="urn:schemas-microsoft-com:office:office"
+>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="x-apple-disable-message-reformatting" />
+    <title></title>
+    <!--[if mso]>
+      <style>
+        table {
+          border-collapse: collapse;
+          border-spacing: 0;
+          border: none;
+          margin: 0;
+        }
+        div,
+        td {
+          padding: 0;
+        }
+        div {
+          margin: 0 !important;
+        }
+      </style>
+      <noscript>
+        <xml>
+          <o:OfficeDocumentSettings>
+            <o:PixelsPerInch>96</o:PixelsPerInch>
+          </o:OfficeDocumentSettings>
+        </xml>
+      </noscript>
+    <![endif]-->
+    <style>
+      .header {
+        -webkit-box-flex: 1;
+        -ms-flex: 1;
+        flex: 1;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-pack: center;
+        -ms-flex-pack: center;
+        justify-content: center;
+        -webkit-box-align: center;
+        -ms-flex-align: center;
+        align-items: center;
+        -webkit-box-orient: horizontal;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: row;
+        flex-direction: row;
+        font-family: "Source Code Pro", monospace;
+        font-size: 2.7rem;
+        font-weight: bold;
+      }
+      .container {
+        -webkit-box-flex: 1;
+        -ms-flex: 1;
+        flex: 1;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-pack: center;
+        -ms-flex-pack: center;
+        justify-content: center;
+        -webkit-box-align: center;
+        -ms-flex-align: center;
+        align-items: center;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+        flex-direction: column;
+      }
+      .card {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: horizontal;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: row;
+        flex-direction: row;
+        width: min(90%, 45rem);
+        -webkit-box-shadow: 0 20px 34px hsla(20deg, 1%, 52%, 0.29);
+        box-shadow: 0 20px 34px hsla(20deg, 1%, 52%, 0.29);
+        background-color: #e97340;
+        overflow: hidden;
+        margin: 1rem;
+        height: min(23rem, 30rem);
+      }
+      .image {
+        max-width: 100%;
+        min-height: 100%;
+        -o-object-fit: cover;
+        object-fit: cover;
+        -webkit-clip-path: polygon(
+          -4px -4px,
+          100.4% -3px,
+          91.2% 102.57%,
+          -0.8% 102.97%
+        );
+        clip-path: polygon(
+          -4px -4px,
+          100.4% -3px,
+          91.2% 102.57%,
+          -0.8% 102.97%
+        );
+      }
+      .link {
+        text-decoration: underline
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      class="header"
+    >
+      <div>News Highlights</div>
+    </div>
+    <div
+      class="container"
+    >
+      <% for (var i = 0; i < data.length; i++) { %>
+      <div
+        class="card"
+      >
+        <div style="width: 40%">
+          <img
+            src="<%= data[i].urlToImage %>"
+            class="image"
+          />
+        </div>
+        <div style="width: 60%; position: relative; padding: 1.5rem">
+          <a href="/" style="text-decoration: none; color: black">
+            <h2 style="font-family: 'Source Code Pro', monospace">
+              <%= data[i].title %>
+            </h2>
+            <p style="font-family: 'Source Code Pro', monospace">
+              <%= data[i].description %>
+            </p>
+            <small style="font-family: 'Source Code Pro', monospace"
+              class="small"
+              >delivered by
+              <a
+                href="https://app.theultimatenews.xyz"
+                class="link"
+                >The Ultimate News</a
+              ></small
+            >
+          </a>
+        </div>
+      </div>
+      <% } %>
+    </div>
+  </body>
+</html>
