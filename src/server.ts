@@ -38,7 +38,7 @@ app.use(loggerMiddleware);
 
 routes(app);
 
-// newSaveCron.start();
+newSaveCron.start();
 
 app.listen(PORT, () => {
   console.log(`Application running successfully on ${PORT}`);

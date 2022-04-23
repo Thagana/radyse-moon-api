@@ -97,7 +97,7 @@ const saveNews = async (
   }
 };
 
-const saveNewsCron = cron.schedule("*/2 * * * *", async () => {
+const saveNewsCron = cron.schedule("0 0 * * *", async () => {
   try {
     const settings = await NewsSettings.find({});
     for (let i = 0; i < settings.length; i++) {
