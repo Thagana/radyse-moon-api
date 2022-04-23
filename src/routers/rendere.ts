@@ -6,7 +6,7 @@ import ArticleModel from '../models/Mongodb/Articles';
 const renderer = async (req: Request, res: Response) => {
     try {
         const articles = await ArticleModel.find({}).limit(10) as DataFrame[];
-        await sendPushNotification('ExponentPushToken[_DBC6uOBvTN9kUUudAmdEE]', articles);
+        await sendPushNotification('', articles);
         res.render('emails', { data: articles });
     } catch (error) {
         res.send('Error');
