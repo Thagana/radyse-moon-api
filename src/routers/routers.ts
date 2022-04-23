@@ -3,12 +3,14 @@ import auth from "./auth";
 import headlines from "./news";
 import profile from './profile';
 import contactForm from './contact';
+import emails from './rendere';
 
 const Routes = (app: Express) => {
   app.use("/news", headlines);
   app.use('/auth', auth);
   app.use('/user', profile);
-  app.use('/contact-form', contactForm)
+  app.use('/contact-form', contactForm);
+  app.use('/emails', emails);
 };
 
 export default Routes;

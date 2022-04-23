@@ -4,10 +4,11 @@ import { v4 } from "uuid";
 import urlBuilder from "../helpers/urlBuilder";
 import insertIntoDB from "../helpers/insertIntoDB";
 import NewsSettings from "../models/Mongodb/NewsSettings";
-import cron from 'node-cron';
-import PushTokens from '../models/Mongodb/PushTokens';
-import sendPushNotification from '../helpers/sendPushNotification';
-
+import cron from "node-cron";
+import PushTokens from "../models/Mongodb/PushTokens";
+import sendPushNotification from "../helpers/sendPushNotification";
+import sentMailNotification from "../helpers/sendMailNotification";
+import UserModel from "../models/Mongodb/Users";
 
 interface ArticleResponse {
   source: {
@@ -36,10 +37,12 @@ interface DataFormat {
   category: string;
 }
 
-const saveNews = async (userId: string): Promise<{ success: boolean }> => {
+const saveNews = async (
+  userId: string
+): Promise<{ success: boolean; data?: DataFormat[] }> => {
   try {
     const settings = await NewsSettings.findOne({
-        user_id: userId,
+      user_id: userId,
     }).exec();
 
     if (!settings) {
@@ -80,43 +83,59 @@ const saveNews = async (userId: string): Promise<{ success: boolean }> => {
       await insertIntoDB(dateFormat);
       return {
         success: true,
-      }
+        data: dateFormat,
+      };
     }
     return {
-      success: false
-    }
+      success: false,
+    };
   } catch (error) {
     logger.error((error as Error).stack);
     return {
-      success: false
-    }
+      success: false,
+    };
   }
 };
 
-const saveNewsCron = cron.schedule('0 */6 * * *', async () => {
-  const settings = await NewsSettings.find({
-      push_enabled: 1
-  });
+const saveNewsCron = cron.schedule("*/2 * * * *", async () => {
+  try {
+    const settings = await NewsSettings.find({});
+    for (let i = 0; i < settings.length; i++) {
+      if (settings[i].push_enabled || settings[i].email_notification) {
+        const saved = await saveNews(settings[i].user_id);
 
-  for (let i = 0; i < settings.length; i++) {
-    const saved = await saveNews(settings[i].user_id);
-    if (saved.success) {
-      // Send Push Notification
-      const token = await PushTokens.findOne({
-          user_id: settings[i].user_id
-      }).exec()
-      
-      if (token) {
-        await sendPushNotification(token.token);
-        logger.info('PUSH SENT ...');
-      } else {
-        logger.info('PUSH NOT SENT [TOKEN_NOT_FOUND] ...');
+        if (saved.success) {
+          // Send Notification
+          const token = await PushTokens.findOne({
+            user_id: settings[i].user_id,
+          }).exec();
+
+          if (settings[i].push_enabled) {
+            if (token) {
+              await sendPushNotification(token.token);
+              logger.info("PUSH SENT ...");
+            } else {
+              logger.info("PUSH NOT SENT [TOKEN_NOT_FOUND] ...");
+            }
+          }
+          if (settings[i].email_notification) {
+            const user = await UserModel.findOne({
+              id: settings[i].user_id,
+            });
+            if (user && saved.data) {
+              await sentMailNotification(user.email, saved.data);
+            } else {
+              logger.error("Failed to get user and data");
+            }
+          }
+        } else {
+          logger.info("PUSH NOT SENT [FAILED_TO_SAVE]...");
+        }
       }
-    } else {
-      logger.info('PUSH NOT SENT [FAILED_TO_SAVE]...');
     }
+  } catch (error) {
+    logger.error(error);
   }
-
-})
+});
 
 export default saveNewsCron;

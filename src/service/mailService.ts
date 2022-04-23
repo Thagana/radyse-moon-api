@@ -1,7 +1,10 @@
 import nodemailer from "nodemailer";
 import Logger from "../utils/logger";
 import {configs}  from "../configs/app.configs";
-
+import logger from "../utils/logger";
+import ejs from 'ejs'
+import path from "path";
+import DataFrame from "../interface/data-frame-interface";
 class sendMail {
   username: string;
 
@@ -82,7 +85,7 @@ class sendMail {
       });
       const data = {
         from: configs.MAIL_USER_NAME,
-        to: 'service@theultimatenews.xyz',
+        to: 'socialmetre.za@gmail.com',
         subject: `Update Mailing list`,
         html: `<html>
                         <div>
@@ -96,6 +99,33 @@ class sendMail {
       await transporter.sendMail(data);
       return true
     } catch (error) {
+      logger.error(error);
+      return false;
+    }
+  }
+
+  static async sendMailNotification(email: string, articles: DataFrame[]) {
+    try {
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: configs.MAIL_USER_NAME,
+          pass: configs.MAIL_PASSWORD,
+        },
+      });
+      
+      const html = await ejs.renderFile(path.join(__dirname, '../views/emails.ejs'), { data: articles }, {async: true});
+
+      const data = {
+        from: configs.MAIL_USER_NAME,
+        to: email,
+        subject: `The Ultimate News Digest`,
+        html: html,
+      };
+      await transporter.sendMail(data);
+      return true
+    } catch (error) {
+      logger.error(error);
       return false;
     }
   }
