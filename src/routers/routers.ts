@@ -3,6 +3,7 @@ import auth from "./auth";
 import headlines from "./news";
 import profile from './profile';
 import contactForm from './contact';
+import welcome from './welcome';
 // import emails from './rendere';
 
 const Routes = (app: Express) => {
@@ -10,6 +11,7 @@ const Routes = (app: Express) => {
   app.use('/auth', auth);
   app.use('/user', profile);
   app.use('/contact-form', contactForm);
+  app.use('/', welcome);
   // app.use('/emails', emails);
 };
 
