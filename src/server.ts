@@ -24,14 +24,7 @@ const app = express();
 app.set("view engine", "ejs");
 app.set("views", __dirname + "/views");
 
-app.use(
-  helmet.contentSecurityPolicy({
-    useDefaults: true,
-    directives: {
-      "img-src": ["'self'", "https: data:"],
-    },
-  })
-);
+app.use(helmet());
 app.use(cors());
 app.use(express.json());
 app.use(loggerMiddleware);
