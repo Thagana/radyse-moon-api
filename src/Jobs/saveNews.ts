@@ -97,7 +97,7 @@ const saveNews = async (
   }
 };
 
-const saveNewsCron = cron.schedule("*/2 * * * *", async () => {
+const saveNewsCron = cron.schedule("0 0 * * *", async () => {
   try {
     const settings = await NewsSettings.find({});
     for (let i = 0; i < settings.length; i++) {
@@ -112,7 +112,7 @@ const saveNewsCron = cron.schedule("*/2 * * * *", async () => {
 
           if (settings[i].push_enabled) {
             if (token) {
-              await sendPushNotification(token.token);
+              await sendPushNotification(token.token, saved.data);
               logger.info("PUSH SENT ...");
             } else {
               logger.info("PUSH NOT SENT [TOKEN_NOT_FOUND] ...");
