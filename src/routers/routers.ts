@@ -4,15 +4,15 @@ import headlines from "./news";
 import profile from './profile';
 import contactForm from './contact';
 import welcome from './welcome';
-// import emails from './rendere';
+import bookmark from './bookmarks';
 
 const Routes = (app: Express) => {
   app.use("/news", headlines);
+  app.use('/bookmark', bookmark);
   app.use('/auth', auth);
   app.use('/user', profile);
   app.use('/contact-form', contactForm);
   app.use('/', welcome);
-  // app.use('/emails', emails);
 };
 
 export default Routes;
