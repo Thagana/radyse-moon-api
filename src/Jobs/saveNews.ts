@@ -71,7 +71,7 @@ const saveNews = async (
           url: item.url,
           urlToImage:
             item.urlToImage ||
-            "https://kulture-bucket.s3.af-south-1.amazonaws.com/68122202.jpeg",
+            "https://avatars.githubusercontent.com/u/68122202?s=400&u=4abc9827a8ca8b9c19b06b9c5c7643c87da51e10&v=4",
           publishedAt: item.publishedAt || "Unknown",
           description: item.description || "Not Available",
           dateCreated: new Date().toISOString(),

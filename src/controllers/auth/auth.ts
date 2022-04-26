@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import logger from "../../utils/logger";
 import User from "../../models/Mongodb/Users";
-import jwt, { VerifyOptions } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { configs } from "../../configs/app.configs";
 import NewsSettings from "../../models/Mongodb/NewsSettings";
 import Mail from '../../service/mailService';
@@ -18,16 +18,15 @@ const login = async (request: Request, response: Response): Promise<Response> =>
     }
 
     const user = await User.findOne({
-        code,
-    }).exec();
-
+        token: code
+    });
+    
     if (!user) {
       return response.status(400).json({
         success: false,
         message: 'User not found',
       });
     }
-
     // LOGIN
     const jwtToken = await jwt.sign(
       { id: user._id },
@@ -71,7 +70,7 @@ const register = async (request: Request, response: Response) => {
         first_name: "first_name",
         last_name: "last_name",
         email,
-        avatar: "https://kulture-bucket.s3.af-south-1.amazonaws.com/68122202.jpeg",
+        avatar: "https://avatars.githubusercontent.com/u/68122202?s=400&u=4abc9827a8ca8b9c19b06b9c5c7643c87da51e10&v=4",
         token: token,
     });
 
