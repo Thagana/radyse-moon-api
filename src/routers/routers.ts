@@ -5,6 +5,7 @@ import profile from './profile';
 import contactForm from './contact';
 import welcome from './welcome';
 import bookmark from './bookmarks';
+import render from './rendere';
 
 const Routes = (app: Express) => {
   app.use("/news", headlines);
@@ -12,6 +13,7 @@ const Routes = (app: Express) => {
   app.use('/auth', auth);
   app.use('/user', profile);
   app.use('/contact-form', contactForm);
+  app.use('/render', render)
   app.use('/', welcome);
 };
 
