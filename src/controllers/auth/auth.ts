@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import { configs } from "../../configs/app.configs";
 import NewsSettings from "../../models/Mongodb/NewsSettings";
 import Mail from '../../service/mailService';
+import tokenGenerator from "../../helpers/tokenGenerator";
 
 
 const login = async (request: Request, response: Response): Promise<Response> => {
@@ -46,13 +47,6 @@ const login = async (request: Request, response: Response): Promise<Response> =>
   }
 };
 
-const tokenGenerator = () => {
-    let val = ''
-    for (let i = 0; i < 5; i += 1) {
-      val += `${Math.round(Math.random() * 10)}`
-    }
-    return val
-}
 
 const register = async (request: Request, response: Response) => {
   try {
@@ -61,6 +55,7 @@ const register = async (request: Request, response: Response) => {
     const user = await User.findOne({
       email,
     }).exec();
+    
   const token = tokenGenerator()
 
   if (!user) {
@@ -82,6 +77,7 @@ const register = async (request: Request, response: Response) => {
       category: 'general',
       push_enabled: 0,
       email_notification: 0,
+      web_push_notification: 0,
     })
     const mailer = new Mail('User', email, token);
     const sendMail = await mailer.send();

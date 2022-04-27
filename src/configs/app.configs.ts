@@ -11,6 +11,9 @@ const devConfigs = {
     TOKEN_SECRET: process.env.TOKEN_SECRET || '',
     WEATHER_API_KEY: process.env.WEATHER_API_KEY || '',
     MAIL_HOST: process.env.MAIL_HOST || '',
+    WEB_PUSH_CONTACT: process.env.WEB_PUSH_CONTACT || '',
+    PUBLIC_VAPID_KEY: process.env.PUBLIC_VAPID_KEY || '',
+    PRIVATE_VAPID_KEY: process.env.PRIVATE_VAPID_KEY || '',
     URL: 'https://theultimatenews.xyz'
 }
 
@@ -23,6 +26,9 @@ const prodConfigs = {
     TOKEN_SECRET: process.env.TOKEN_SECRET || '',
     WEATHER_API_KEY: process.env.WEATHER_API_KEY || '',
     MAIL_HOST: process.env.MAIL_HOST || '',
+    WEB_PUSH_CONTACT: process.env.WEB_PUSH_CONTACT || '',
+    PUBLIC_VAPID_KEY: process.env.PUBLIC_VAPID_KEY || '',
+    PRIVATE_VAPID_KEY: process.env.PRIVATE_VAPID_KEY || '',
     URL: 'https://theultimatenews.xyz'
 }
 

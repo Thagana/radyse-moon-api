@@ -10,6 +10,7 @@ interface INewsSettings {
     frequency: number;
     push_enabled: number;
     email_notification: number;
+    web_push_notification: number;
 }
 
 const schema = new Schema<INewsSettings>({
@@ -37,6 +38,10 @@ const schema = new Schema<INewsSettings>({
     frequency: {
         type: Number,
         required: true,
+    },
+    web_push_notification: {
+        type: Number,
+        require: true,
     },
     email_notification: {
         type: Number,
