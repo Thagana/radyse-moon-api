@@ -5,14 +5,17 @@ import fetchWeather from "../../Jobs/fetchWeather";
 import logger from "../../utils/logger";
 import Tokens from "../../models/Mongodb/PushTokens";
 import UserModel from "../../models/Mongodb/Users";
-import updateUserDetails from '../../helpers/updateUserDetails';
-import updateEmailNotification from '../../helpers/updateEmailNotification';
-
+import updateUserDetails from "../../helpers/updateUserDetails";
+import updateEmailNotification from "../../helpers/updateEmailNotification";
+import updateWebPushNotification from "../../helpers/updateWebPushNotification";
+import webpush from "web-push";
+import { configs } from '../../configs/app.configs';
+import PushToken from "../../models/Mongodb/PushTokens";
 
 const pushNotificationService = async (userId: string, token: string) => {
   try {
     const tokens = await Tokens.findOne({
-        user_id: userId,
+      user_id: userId,
     }).exec();
 
     if (!tokens) {
@@ -22,8 +25,10 @@ const pushNotificationService = async (userId: string, token: string) => {
       });
     }
     await Tokens.findOneAndUpdate({ token: token }, { user_id: userId });
-    await NewsSettings.findOneAndUpdate({ push_enabled: 1 }, { user_id: userId });
-
+    await NewsSettings.findOneAndUpdate(
+      { push_enabled: 1 },
+      { user_id: userId }
+    );
   } catch (error) {
     logger.error(error);
   }
@@ -45,7 +50,7 @@ const getSettings = async (
     const userId = id;
 
     const settings = await NewsSettings.findOne({
-        user_id: userId,
+      user_id: userId,
     }).exec();
 
     if (!settings) {
@@ -55,8 +60,8 @@ const getSettings = async (
       });
     }
     const user = await UserModel.findOne({
-      id: userId
-    })
+      id: userId,
+    });
     return response.status(200).json({
       success: true,
       data: {
@@ -64,8 +69,9 @@ const getSettings = async (
         language: settings.language,
         frequency: settings.frequency,
         pushState: settings.push_enabled,
-        name: user?.first_name + ' ' + user?.last_name,
-        email_notification: settings.email_notification
+        name: user?.first_name + " " + user?.last_name,
+        web_push_notification: settings.web_push_notification,
+        email_notification: settings.email_notification,
       },
     });
   } catch (error) {
@@ -88,7 +94,7 @@ const userWeather = async (request: Request | any, response: Response) => {
     }
     const userId = Number(id);
     const weather = await WeatherLocation.findOne({
-        user_id: userId,
+      user_id: userId,
     }).exec();
     if (!weather) {
       return response.status(200).json({
@@ -142,14 +148,14 @@ const setUserLocation = async (
 
     const userId = id;
     const hasWeather = await WeatherLocation.findOne({
-        user_id: userId,
+      user_id: userId,
     }).exec();
 
     if (hasWeather) {
       await WeatherLocation.findOneAndUpdate(
         { latitude, longitude },
         {
-            user_id: userId,
+          user_id: userId,
         }
       );
       const weather = await fetchWeather(latitude, longitude);
@@ -223,11 +229,14 @@ const updateUserSettings = async (request: Request, response: Response) => {
 
     let success = false;
     switch (type) {
-      case 'SET_NAME':
+      case "SET_NAME":
         success = await updateUserDetails(firstName, lastName, id);
         break;
-      case 'SET_EMAIL_NOTIFICATION':
+      case "SET_EMAIL_NOTIFICATION":
         success = await updateEmailNotification(id, state);
+      case "PUSH_ENABLE_WEB":
+        success = await updateWebPushNotification(id, state);
+        break;
       default:
         break;
     }
@@ -235,13 +244,12 @@ const updateUserSettings = async (request: Request, response: Response) => {
       return response.status(400).json({
         success: false,
         message: "Failed to update record",
-      });      
+      });
     }
     return response.status(200).json({
       success: true,
       message: "Successfully update record",
     });
-
   } catch (error) {
     logger.error(error);
     return response.status(400).json({
@@ -249,6 +257,66 @@ const updateUserSettings = async (request: Request, response: Response) => {
       message: "Something went wrong, please try again",
     });
   }
-}
+};
 
-export default { getSettings, userWeather, setUserLocation, updateSettings, updateUserSettings };
+const subscribe = async (request: Request, response: Response) => {
+  try {
+
+    const subscription = request.body;
+    // @ts-ignore
+    const id = request.user.id;
+
+    if (!id) {
+      return response.status(400).json({
+        success: false,
+        message: "Access denied",
+      });
+    }
+
+    webpush.setVapidDetails(
+      configs.WEB_PUSH_CONTACT,
+      configs.PUBLIC_VAPID_KEY,
+      configs.PRIVATE_VAPID_KEY
+    );
+
+    const payload = JSON.stringify({
+      title: "Thank you",
+      body: "Thank you for enabling push notification, new news update will be send here",
+    });
+
+    webpush
+      .sendNotification(subscription, payload)
+      .then(async () => {
+        const exist = await PushToken.findOne({
+          user_id: id
+        })
+        if (!exist) {
+          await PushToken.create({
+            user_id: id,
+            title: 'WEB',
+            token: JSON.stringify(subscription)
+          })
+        } else {
+          PushToken.updateOne({ user_id: id }, {
+            token: JSON.stringify(subscription)
+          })
+        }
+      })
+      .catch((e) => logger.error(e.stack));
+      
+  } catch (error) {
+    logger.error(error);
+    return response.status(400).json({
+      success: false,
+      message: "Something went wrong, please try again",
+    });
+  }
+};
+export default {
+  getSettings,
+  userWeather,
+  setUserLocation,
+  updateSettings,
+  updateUserSettings,
+  subscribe,
+};
