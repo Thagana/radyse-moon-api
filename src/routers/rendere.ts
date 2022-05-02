@@ -10,7 +10,7 @@ const renderer = async (req: Request, res: Response) => {
     const articles = (await ArticleModel.find({}).limit(10)) as DataFrame[];
     
     const pushToken = await PushToken.findOne({
-      user_id: "6269953a327936faec0d4639",
+      user_id: "",
     });
 
     if (!pushToken) {
