@@ -36,7 +36,7 @@ const headlines = async (
     if (!data.success) {
       return response.status(400).json({
         success: false,
-        data: data.data,
+        data: 'Failed to get articles',
       });
     }
     return response.status(200).json({
