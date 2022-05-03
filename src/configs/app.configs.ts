@@ -15,7 +15,8 @@ const devConfigs = {
     PUBLIC_VAPID_KEY: process.env.PUBLIC_VAPID_KEY || '',
     PRIVATE_VAPID_KEY: process.env.PRIVATE_VAPID_KEY || '',
     URL: 'https://theultimatenews.xyz',
-    SENTRY_DNS: process.env.SENTRY_DNS
+    SENTRY_DNS: process.env.SENTRY_DNS || '',
+    PAY_STACK_SECRET: process.env.PAY_STACK_SECRET || '',
 }
 
 const prodConfigs = {
@@ -31,7 +32,8 @@ const prodConfigs = {
     PUBLIC_VAPID_KEY: process.env.PUBLIC_VAPID_KEY || '',
     PRIVATE_VAPID_KEY: process.env.PRIVATE_VAPID_KEY || '',
     URL: 'https://theultimatenews.xyz',
-    SENTRY_DNS: process.env.SENTRY_DNS
+    SENTRY_DNS: process.env.SENTRY_DNS || '',
+    PAY_STACK_SECRET: process.env.PAY_STACK_SECRET || '',
 }
 
 export const configs = process.env.NODE_ENV === 'production' ? prodConfigs : devConfigs;
