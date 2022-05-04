@@ -1,12 +1,12 @@
 import axios from "axios";
 import IPlan from "../../interface/plan-interface";
-import { Transaction } from '../../interface/Transaction-interface';
-import { Subscription } from '../../interface/Subscription-interface';
+import { Transaction } from "../../interface/Transaction-interface";
+import { Subscription } from "../../interface/Subscription-interface";
 
 interface Transactions {
-    authorization_url: string;
-    access_code: string;
-    reference: string;
+  authorization_url: string;
+  access_code: string;
+  reference: string;
 }
 
 class PayStack {
@@ -39,56 +39,80 @@ class PayStack {
         .catch((error) => reject(error));
     });
   }
-  createTransaction(email: string, amount: number) {
+  createTransaction(
+    email: string,
+    amount: number,
+    callbackUrl: string,
+    plan: string
+  ) {
     return new Promise<Transactions>((resolve, reject) => {
-      axios.post(
-        `${this.PAY_STACK_URL}/transaction/initialize`,
-        {
-          email,
-          amount,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${this.token}`,
+      axios
+        .post(
+          `${this.PAY_STACK_URL}/transaction/initialize`,
+          {
+            email,
+            amount,
+            plan,
+            callback_url: callbackUrl,
           },
-        }
-      ).then((response) => {
-        const { data } = response.data
-        resolve(data);
-      }).catch(error => reject(error));
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${this.token}`,
+            },
+          }
+        )
+        .then((response) => {
+          const { data } = response.data;
+          resolve(data);
+        })
+        .catch((error) => reject(error));
     });
   }
 
   verifyTransaction(reference: string) {
     return new Promise<Transaction>((resolve, reject) => {
-      axios.post(`${this.PAY_STACK_URL}/transaction/verify/${reference}`,{}, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${this.token}`,
-        }
-      }).then((response) => {
-        const res = response.data;
-        resolve(res);
-      }).catch(error => reject(error))
-    })
+      axios
+        .get(`${this.PAY_STACK_URL}/transaction/verify/${reference}`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${this.token}`,
+          },
+        })
+        .then((response) => {
+          const res = response.data;
+          resolve(res);
+        })
+        .catch((error) => reject(error));
+    });
   }
 
   subscribeUser(customer: string, plan: string) {
     return new Promise<Subscription>((resolve, reject) => {
       if (!customer || !plan) {
-        reject('Customer and Plan are need')
+        reject("Customer and Plan are need");
       }
-      axios.post(`${this.PAY_STACK_URL}/subscription`, {
-        customer,
-        plan
-      }).then((response) => {
-        const res = response.data;
-        resolve(res);
-      }).catch(error => reject(error))
-    })
+      axios
+        .post(
+          `${this.PAY_STACK_URL}/subscription`,
+          {
+            customer,
+            plan,
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${this.token}`,
+            },
+          }
+        )
+        .then((response) => {
+          const res = response.data;
+          resolve(res);
+        })
+        .catch((error) => reject(error));
+    });
   }
-
 }
 
 export default PayStack;

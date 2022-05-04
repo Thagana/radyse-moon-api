@@ -17,6 +17,7 @@ const devConfigs = {
     URL: 'https://theultimatenews.xyz',
     SENTRY_DNS: process.env.SENTRY_DNS || '',
     PAY_STACK_SECRET: process.env.PAY_STACK_SECRET || '',
+    returnUrl: 'http://localhost:3001/subscription/payment/verify',
 }
 
 const prodConfigs = {
@@ -34,6 +35,7 @@ const prodConfigs = {
     URL: 'https://theultimatenews.xyz',
     SENTRY_DNS: process.env.SENTRY_DNS || '',
     PAY_STACK_SECRET: process.env.PAY_STACK_SECRET || '',
+    returnUrl: process.env.PAY_STACK_RETURN_URL || '',
 }
 
 export const configs = process.env.NODE_ENV === 'production' ? prodConfigs : devConfigs;

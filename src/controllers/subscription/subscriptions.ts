@@ -4,6 +4,7 @@ import Subscription from "../../models/Mongodb/Subscription";
 import logger from "../../utils/logger";
 import { configs } from "../../configs/app.configs";
 import Plan from "../../models/Mongodb/Plan";
+import getPlan from "../../helpers/getplan";
 
 const getSubscriptions = async (request: Request, response: Response) => {
   try {
@@ -92,7 +93,18 @@ const createTransactions = async (request: Request, response: Response) => {
     const { email, amount } = request.body;
 
     const PayStackInst = new PayStack(configs.PAY_STACK_SECRET);
-    const trans = await PayStackInst.createTransaction(email, amount);
+    
+    const plan = await getPlan(amount);
+
+    if (!plan.success) {
+      return response.status(400).json({
+        success: false,
+        message: 'Could not find plan'
+      })
+    }
+
+    const trans = await PayStackInst.createTransaction(email, amount, configs.returnUrl, plan.id);
+
     return response.status(200).json({
       success: true,
       data: trans,
@@ -120,6 +132,8 @@ const verifyTransactions = async (request: Request, response: Response) => {
 
     const customer = verify.data.customer.customer_code;
     const plan = verify.data.plan;
+    
+    console.log(customer, plan, verify);
 
     const subscription = await PayStackInst.subscribeUser(customer, plan);
     await Subscription.create(subscription.data);
@@ -128,6 +142,7 @@ const verifyTransactions = async (request: Request, response: Response) => {
       message: "Successfully created a subscription",
     });
   } catch (error) {
+    console.log(error);
     logger.error(error);
     return response.status(400).json({
       success: false,
