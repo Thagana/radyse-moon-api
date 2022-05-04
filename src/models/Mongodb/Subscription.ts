@@ -1,36 +1,66 @@
-import { Schema, model } from 'mongoose';
+import { Schema , model} from "mongoose";
+import { TransactionData } from '../../interface/Transaction-interface'
 
-interface ISubscription {
-    user_id: string;
-    subscription_id: string;
-    start_date: string;
-    end_date: string;
-    created_at: string;
-    billed: string;
-    state: string
-}
+const schema = new Schema<TransactionData>({
+    amount: {
+        type: Number,
+        required: false
+    },
+    currency: {
+        required: false,
+        type: String
+    },
+    transaction_date: {
+        required: false,
+        type: String
+    },
+    status: {
+        required: false,
+        type: String
+    },
+    reference: {
+        required: false,
+        type: String
+    },
+    domain: {
+        required: false,
+        type: String
+    },
+    metadata: {
+        required: false,
+        type: Number
+    },
+    gateway_response: {
+        type: String,
+        required: false,
+    },
+    message: {
+        type: String,
+        required: false,
+    },
+    channel: {
+        type: String,
+        required: false,
+    },
+    ip_address: {
+        type: String,
+        required: false,
+    },
+    log: Schema.Types.Mixed,
+    fees: {
+        type: String,
+        required: false,
+    },
+    authorization: Schema.Types.Mixed,
+    customer: Schema.Types.Mixed,
+    plan: {
+        type: String,
+        required: false,
+    },
+    requested_amount: {
+        type: Number,
+        required: false,
+    },
+})
 
-const schema = new Schema<ISubscription>({
-    user_id: {
-        required: true,
-        type: String,
-    },
-    start_date: {
-        required: true,
-        type: String,
-    },
-    end_date: {
-        required: true,
-        type: String,
-    },
-    created_at: {
-        require: true,
-        type: String,
-    },
-    state: {
-        required: true,
-        type: String,
-    }
-});
-
-export default model<ISubscription>('Subscriptions', schema);
+export default model<TransactionData>('Subscription', schema)

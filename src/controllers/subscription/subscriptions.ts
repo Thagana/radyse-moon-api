@@ -106,4 +106,33 @@ const createTransactions = async (request: Request, response: Response) => {
   }
 };
 
-export default { getSubscriptions, createPlan, getPlans, createTransactions };
+const verifyTransactions = async (request: Request, response: Response) => {
+  try {
+    const { reference } = request.body;
+    if (!reference) {
+      return response.status(400).json({
+        success: false,
+        message: "Reference not found",
+      });
+    }
+    const PayStackInst = new PayStack(configs.PAY_STACK_SECRET);
+    const verify = await PayStackInst.verifyTransaction(reference);
+
+    const customer = verify.data.customer.customer_code;
+    const plan = verify.data.plan;
+
+    const subscription = await PayStackInst.subscribeUser(customer, plan);
+    await Subscription.create(subscription.data);
+    return response.status(200).json({
+      success: true,
+      message: "Successfully created a subscription",
+    });
+  } catch (error) {
+    logger.error(error);
+    return response.status(400).json({
+      success: false,
+      message: "Something went wrong, please try again",
+    });
+  }
+};
+export default { getSubscriptions, createPlan, getPlans, createTransactions, verifyTransactions };
