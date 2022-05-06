@@ -1,7 +1,7 @@
 import axios from "axios";
 import IPlan from "../../interface/plan-interface";
 import { Transaction } from "../../interface/Transaction-interface";
-import { Subscription } from "../../interface/Subscription-interface";
+import { Subscription, Subscriptions } from "../../interface/Subscription-interface";
 
 interface Transactions {
   authorization_url: string;
@@ -43,7 +43,6 @@ class PayStack {
     email: string,
     amount: number,
     callbackUrl: string,
-    plan: string
   ) {
     return new Promise<Transactions>((resolve, reject) => {
       axios
@@ -52,7 +51,6 @@ class PayStack {
           {
             email,
             amount,
-            plan,
             callback_url: callbackUrl,
           },
           {
@@ -90,7 +88,7 @@ class PayStack {
   subscribeUser(customer: string, plan: string) {
     return new Promise<Subscription>((resolve, reject) => {
       if (!customer || !plan) {
-        reject("Customer and Plan are need");
+        reject("Customer and Plan are required");
       }
       axios
         .post(
@@ -112,6 +110,27 @@ class PayStack {
         })
         .catch((error) => reject(error));
     });
+  }
+
+  getSubscribers() {
+    return new Promise<Subscriptions>((resolve, reject) => {
+      axios
+        .get(`${this.PAY_STACK_URL}/subscription`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${this.token}`,
+          },
+        })
+        .then((response) => {
+          const res = response.data;
+          resolve(res);
+        })
+        .catch((error) => reject(error));
+    });
+  }
+
+  getSubscriber() {
+    
   }
 }
 
