@@ -4,6 +4,8 @@ import Subscription from "../../models/Mongodb/Subscription";
 import logger from "../../utils/logger";
 import { configs } from "../../configs/app.configs";
 import Plan from "../../models/Mongodb/Plan";
+import getPlan from "../../helpers/getplan";
+import UserModel from "../../models/Mongodb/Users";
 
 const getSubscriptions = async (request: Request, response: Response) => {
   try {
@@ -17,20 +19,23 @@ const getSubscriptions = async (request: Request, response: Response) => {
       });
     }
 
-    const subscriptions = await Subscription.findOne({
-      user_id: id,
+    const findUser = await UserModel.findOne({
+      _id: id,
     });
 
-    if (!subscriptions) {
-      return response.status(200).json({
+    if (!findUser) {
+      return response.status(400).json({
         success: false,
-        message: "You don't have any subscriptions, create one",
+        message: "Could not find user",
       });
     }
+    const PayStackInst = new PayStack(configs.PAY_STACK_SECRET);
+
+    const subs = await PayStackInst.getSubscribers();
 
     return response.status(200).json({
       success: true,
-      data: [],
+      data: subs,
     });
   } catch (error) {
     logger.error(error);
@@ -92,7 +97,22 @@ const createTransactions = async (request: Request, response: Response) => {
     const { email, amount } = request.body;
 
     const PayStackInst = new PayStack(configs.PAY_STACK_SECRET);
-    const trans = await PayStackInst.createTransaction(email, amount);
+
+    const plan = await getPlan(amount);
+
+    if (!plan.success) {
+      return response.status(400).json({
+        success: false,
+        message: "Could not find plan",
+      });
+    }
+
+    const trans = await PayStackInst.createTransaction(
+      email,
+      amount,
+      configs.returnUrl
+    );
+
     return response.status(200).json({
       success: true,
       data: trans,
@@ -109,6 +129,17 @@ const createTransactions = async (request: Request, response: Response) => {
 const verifyTransactions = async (request: Request, response: Response) => {
   try {
     const { reference } = request.body;
+
+    // @ts-ignore
+    const id = request.user.id;
+
+    if (!id) {
+      return response.status(401).json({
+        success: false,
+        message: "Access denied",
+      });
+    }
+
     if (!reference) {
       return response.status(400).json({
         success: false,
@@ -116,18 +147,30 @@ const verifyTransactions = async (request: Request, response: Response) => {
       });
     }
     const PayStackInst = new PayStack(configs.PAY_STACK_SECRET);
+
     const verify = await PayStackInst.verifyTransaction(reference);
 
     const customer = verify.data.customer.customer_code;
-    const plan = verify.data.plan;
+    const plan = await getPlan(verify.data.amount);
 
-    const subscription = await PayStackInst.subscribeUser(customer, plan);
-    await Subscription.create(subscription.data);
+    if (!plan.success) {
+      return response.status(400).json({
+        success: false,
+        message: "Could not find plan",
+      });
+    }
+
+    const subs = await PayStackInst.subscribeUser(customer, plan.id);
+
+    await Subscription.create({ ...subs.data, user_id: id });
+
     return response.status(200).json({
       success: true,
       message: "Successfully created a subscription",
+      data: subs.data,
     });
   } catch (error) {
+    console.log(error);
     logger.error(error);
     return response.status(400).json({
       success: false,
@@ -135,4 +178,10 @@ const verifyTransactions = async (request: Request, response: Response) => {
     });
   }
 };
-export default { getSubscriptions, createPlan, getPlans, createTransactions, verifyTransactions };
+export default {
+  getSubscriptions,
+  createPlan,
+  getPlans,
+  createTransactions,
+  verifyTransactions,
+};
