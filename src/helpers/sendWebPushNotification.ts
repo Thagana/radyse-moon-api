@@ -5,7 +5,7 @@ import { configs } from "../configs/app.configs";
 import DataFrame from "../interface/data-frame-interface";
 
 export default async function sendWebPushNotification(
-  pushToken: webpush.PushSubscription,
+  pushToken: unknown,
   data: DataFrame[] | undefined
 ) {
   try {
@@ -14,6 +14,7 @@ export default async function sendWebPushNotification(
       configs.PUBLIC_VAPID_KEY,
       configs.PRIVATE_VAPID_KEY
     );
+    const token = pushToken as webpush.PushSubscription
     if (data) {
       for (const item of data) {
 
@@ -24,7 +25,7 @@ export default async function sendWebPushNotification(
           body: item.description,
         });
         webpush
-        .sendNotification(pushToken, payload)
+        .sendNotification(token, payload)
         .then()
         .catch((e) => logger.error(e.stack));
 
@@ -37,7 +38,7 @@ export default async function sendWebPushNotification(
       });
 
       webpush
-      .sendNotification(pushToken, payload)
+      .sendNotification(token, payload)
       .then()
       .catch((e) => logger.error(e.stack));
     }

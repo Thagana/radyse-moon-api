@@ -10,6 +10,7 @@ interface IUserMeta {
     os_version: string;
     engine_name: string;
     cpu_architecture: string;
+    user_id: string;
 }
 
 const schema = new Schema<IUserMeta>({
@@ -49,6 +50,10 @@ const schema = new Schema<IUserMeta>({
         required: true,
         type: String
     },
+    user_id: {
+        required: true,
+        type: String
+    }
 });
 
 export default model<IUserMeta>('UserMeta', schema);

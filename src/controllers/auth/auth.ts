@@ -102,6 +102,7 @@ const register = async (request: Request, response: Response) => {
         os_version: osVersion,
         cpu_architecture: cpuArch,
         engine_name: engine,
+        user_id: newUser._id
       });
 
       const mailer = new Mail("User", email, token);

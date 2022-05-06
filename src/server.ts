@@ -22,7 +22,6 @@ db.on("disconnected", () => console.log("Database disconnected"));
 const app = express();
 
 app.set("view engine", "ejs");
-app.set("views", __dirname + "/views");
 
 app.use(helmet());
 app.use(cors());

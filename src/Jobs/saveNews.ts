@@ -9,6 +9,7 @@ import PushTokens from "../models/Mongodb/PushTokens";
 import sendPushNotification from "../helpers/sendPushNotification";
 import sentMailNotification from "../helpers/sendMailNotification";
 import UserModel from "../models/Mongodb/Users";
+import sendWebPushNotification from "../helpers/sendWebPushNotification";
 
 interface ArticleResponse {
   source: {
@@ -118,16 +119,24 @@ const saveNewsCron = cron.schedule("0 0 * * *", async () => {
               logger.info("PUSH NOT SENT [TOKEN_NOT_FOUND] ...");
             }
           }
+          const user = await UserModel.findOne({
+            id: settings[i].user_id,
+          });
+
           if (settings[i].email_notification) {
-            const user = await UserModel.findOne({
-              id: settings[i].user_id,
-            });
             if (user && saved.data) {
               await sentMailNotification(user.email, saved.data);
             } else {
-              logger.error("Failed to get user and data");
+              logger.error("EMAIL_NOTIFICATION_FAILED");
             }
           }
+          if (settings[i].web_push_notification) {
+            if (user && saved.data && token) {
+                await sendWebPushNotification(token.token, saved.data)
+            } else {
+              logger.error("WEB_PUSH_NOTIFICATION_FAILED");
+            }
+          } 
         } else {
           logger.info("PUSH NOT SENT [FAILED_TO_SAVE]...");
         }
