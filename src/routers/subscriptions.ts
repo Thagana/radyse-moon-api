@@ -5,6 +5,7 @@ import auth from "../middleware/auth";
 const router = Router();
 
 router.get("/", auth, subscriptions.getSubscriptions);
+router.get("/user", auth, subscriptions.getSubscription)
 router.get("/plans", auth, subscriptions.getPlans);
 router.post("/plan/create", auth, subscriptions.createPlan);
 router.post("/transaction/create", auth, subscriptions.createTransactions);

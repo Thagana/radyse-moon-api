@@ -23,6 +23,27 @@ export interface Subscription {
   };
 }
 
+export interface SubscriptionData {
+  customer: number;
+  plan: number;
+  integration: number;
+  domain: string;
+  start: number;
+  status: string;
+  quantity: number;
+  amount: number;
+  authorization: Authorization;
+  invoice_limit: number;
+  subscription_code: string;
+  email_token: string;
+  id: number;
+  createdAt: string;
+  updatedAt: string;
+  cron_expression: string;
+  next_payment_date: string;
+  user_id?: string;
+}
+
 export interface Customer {
   first_name: string;
   last_name: string;

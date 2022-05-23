@@ -1,66 +1,79 @@
-import { Schema , model} from "mongoose";
-import { TransactionData } from '../../interface/Transaction-interface'
+import { Schema , model, Mixed} from "mongoose";
+import { SubscriptionData } from '../../interface/Subscription-interface'
 
-const schema = new Schema<TransactionData>({
+const schema = new Schema<SubscriptionData>({
     amount: {
         type: Number,
         required: false
     },
-    currency: {
+    customer: {
         required: false,
-        type: String
+        type: Number
     },
-    transaction_date: {
+    plan: {
         required: false,
-        type: String
+        type: Number
     },
     status: {
         required: false,
         type: String
     },
-    reference: {
+    id: {
         required: false,
-        type: String
+        type: Number
     },
     domain: {
         required: false,
         type: String
     },
-    metadata: {
+    integration: {
         required: false,
         type: Number
     },
-    gateway_response: {
-        type: String,
-        required: false,
-    },
-    message: {
-        type: String,
-        required: false,
-    },
-    channel: {
-        type: String,
-        required: false,
-    },
-    ip_address: {
-        type: String,
-        required: false,
-    },
-    log: Schema.Types.Mixed,
-    fees: {
-        type: String,
-        required: false,
-    },
-    authorization: Schema.Types.Mixed,
-    customer: Schema.Types.Mixed,
-    plan: {
-        type: String,
-        required: false,
-    },
-    requested_amount: {
+    start: {
         type: Number,
         required: false,
     },
+    quantity: {
+        type: Number,
+        required: false,
+    },
+    authorization: {
+        type: Schema.Types.Mixed,
+        required: false,
+    },
+    invoice_limit: {
+        type: Number,
+        required: false,
+    },
+    cron_expression: {
+        type: String,
+        required: true
+    },
+    updatedAt: {
+        type: String,
+        required: false,
+    },
+    createdAt: {
+        type: String,
+        required: false,
+    },
+    next_payment_date: {
+        type: String,
+        required: false
+    },
+    email_token: {
+        type: String,
+        required: true
+    },
+    subscription_code: {
+        type: String,
+        required: false,
+    },
+    user_id: {
+        required: true,
+        type: String
+    }
 })
 
-export default model<TransactionData>('Subscription', schema)
+export default model<SubscriptionData>('Subscription', schema);

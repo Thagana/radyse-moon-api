@@ -29,6 +29,7 @@ const getSubscriptions = async (request: Request, response: Response) => {
         message: "Could not find user",
       });
     }
+
     const PayStackInst = new PayStack(configs.PAY_STACK_SECRET);
 
     const subs = await PayStackInst.getSubscribers();
@@ -37,6 +38,58 @@ const getSubscriptions = async (request: Request, response: Response) => {
       success: true,
       data: subs,
     });
+  } catch (error) {
+    logger.error(error);
+    return response.status(400).json({
+      success: false,
+      message: "Something went wrong, please try again",
+    });
+  }
+};
+
+const getSubscription = async (request: Request, response: Response) => {
+  try {
+    // @ts-ignore
+    const id = request.user.id;
+
+    if (!id) {
+      return response.status(401).json({
+        success: false,
+        message: "Access denied",
+      });
+    }
+    const subs = await Subscription.findOne({
+      user_id: id,
+    });
+
+    if (!subs) {
+      return response.status(200).json({
+        message: 'Could not find subscription',
+        success: false
+      })
+    }
+
+    const plan = await Plan.findOne({
+      id: subs.plan
+    })
+
+    const planFilter = {
+      name: plan?.name
+    }
+    return response.status(200).json({
+      success: true,
+      message: 'Successful',
+      data: {
+        next_payment_date: subs.next_payment_date,
+        amount: subs.amount,
+        start: subs.start,
+        name: plan?.name,
+        status: subs.status,
+        domain: subs.domain,
+        createdAt: subs.createdAt,
+      }
+    })
+    
   } catch (error) {
     logger.error(error);
     return response.status(400).json({
@@ -94,11 +147,30 @@ const getPlans = async (request: Request, response: Response) => {
 
 const createTransactions = async (request: Request, response: Response) => {
   try {
-    const { email, amount } = request.body;
+    const { name } = request.body;
+    // @ts-ignore
+    const id = request.user.id;
+
+    if (!id) {
+      return response.status(401).json({
+        success: false,
+        message: "Access denied",
+      });
+    }
+    const user = await UserModel.findOne({
+      _id: id
+    });
+
+    if (!user) {
+      return response.status(401).json({
+        success: false,
+        message: "User not found",
+      });
+    }
 
     const PayStackInst = new PayStack(configs.PAY_STACK_SECRET);
 
-    const plan = await getPlan(amount);
+    const plan = await getPlan(name);
 
     if (!plan.success) {
       return response.status(400).json({
@@ -108,8 +180,8 @@ const createTransactions = async (request: Request, response: Response) => {
     }
 
     const trans = await PayStackInst.createTransaction(
-      email,
-      amount,
+      user.email,
+      plan.data.amount,
       configs.returnUrl
     );
 
@@ -151,7 +223,7 @@ const verifyTransactions = async (request: Request, response: Response) => {
     const verify = await PayStackInst.verifyTransaction(reference);
 
     const customer = verify.data.customer.customer_code;
-    const plan = await getPlan(verify.data.amount);
+    const plan = await getPlan('', verify.data.amount);
 
     if (!plan.success) {
       return response.status(400).json({
@@ -184,4 +256,5 @@ export default {
   getPlans,
   createTransactions,
   verifyTransactions,
+  getSubscription,
 };
