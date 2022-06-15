@@ -1,7 +1,10 @@
-import axios from "axios";
+import axios, { Axios } from "axios";
 import IPlan from "../../interface/plan-interface";
 import { Transaction } from "../../interface/Transaction-interface";
-import { Subscription, Subscriptions } from "../../interface/Subscription-interface";
+import {
+  Subscription,
+  Subscriptions,
+} from "../../interface/Subscription-interface";
 
 interface Transactions {
   authorization_url: string;
@@ -39,11 +42,7 @@ class PayStack {
         .catch((error) => reject(error));
     });
   }
-  createTransaction(
-    email: string,
-    amount: number,
-    callbackUrl: string,
-  ) {
+  createTransaction(email: string, amount: number, callbackUrl: string) {
     return new Promise<Transactions>((resolve, reject) => {
       axios
         .post(
@@ -129,8 +128,102 @@ class PayStack {
     });
   }
 
-  getSubscriber() {
-    
+  getSubscriber() {}
+
+  updateSubscription(code: string) {
+    return new Promise<{ status: boolean; message: string }>(
+      (resolve, reject) => {
+        axios
+          .post(
+            `${this.PAY_STACK_URL}/subscription/${code}/manage/email`,
+            {},
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${this.token}`,
+              },
+            }
+          )
+          .then((response) => {
+            const data = response.data;
+            resolve(data);
+          })
+          .catch((error) => reject(error));
+      }
+    );
+  }
+  /**
+   *
+   * @param code
+   * @param token
+   * @returns
+   */
+  disableSubscription(code: string, email_token: string) {
+    return new Promise<{ status: boolean; message: string }>(
+      (resolve, reject) => {
+        axios
+          .post(
+            `${this.PAY_STACK_URL}/subscription/disable`,
+            {
+              code,
+              token: email_token,
+            },
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${this.token}`,
+              },
+            }
+          )
+          .then((response) => {
+            const data = response.data;
+            resolve(data);
+          })
+          .catch((error) => reject(error));
+      }
+    );
+  }
+
+  enableSubscription(code: string, email_token: string) {
+    return new Promise<{ status: boolean; message: string }>(
+      (resolve, reject) => {
+        axios
+          .post(
+            `${this.PAY_STACK_URL}/subscription/enable`,
+            {
+              code,
+              token: email_token,
+            },
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${this.token}`,
+              },
+            }
+          )
+          .then((response) => {
+            const data = response.data;
+            resolve(data);
+          })
+          .catch((error) => reject(error));
+      }
+    );
+  }
+
+  getSubscriptions(code: string) {
+    return new Promise<Subscriptions>((resolve, reject) => {
+      axios.get(`${this.PAY_STACK_URL}/subscription/${code}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${this.token}`,
+        },
+      })
+      .then((response) => {
+        const data = response.data;
+        resolve(data);
+      })
+      .catch((error) => reject(error));
+    })
   }
 }
 

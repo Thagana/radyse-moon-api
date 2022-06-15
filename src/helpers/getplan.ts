@@ -1,17 +1,29 @@
-import Plan from "../models/Mongodb/Plan"
+import Plan from "../models/Mongodb/Plan";
 
-const getPlan = async (amount: number) => {
-    try {
-        const plan = await Plan.findOne({
-            amount,
-        });
-        if (!plan) {
-            return { success: false, id: '' };
-        }
-        return { success: true, id: plan.plan_code }
-    } catch (error) {
-        return {  success: false, id: '' }
+const getPlan = async (
+  name: string,
+  amount?: number
+): Promise<{ success: boolean; id: string; data: any }> => {
+  try {
+    if (amount) {
+      const plan = await Plan.findOne({
+        amount,
+      });
+      if (!plan) {
+        return { success: false, id: "", data: "" };
+      }
+      return { success: true, id: plan.plan_code, data: plan };
     }
-}
+    const plan = await Plan.findOne({
+      name,
+    });
+    if (!plan) {
+      return { success: false, id: "", data: "" };
+    }
+    return { success: true, id: plan.plan_code, data: plan };
+  } catch (error) {
+    return { success: false, id: "", data: "" };
+  }
+};
 
 export default getPlan;

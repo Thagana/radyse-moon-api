@@ -14,10 +14,10 @@ const devConfigs = {
     WEB_PUSH_CONTACT: process.env.WEB_PUSH_CONTACT || '',
     PUBLIC_VAPID_KEY: process.env.PUBLIC_VAPID_KEY || '',
     PRIVATE_VAPID_KEY: process.env.PRIVATE_VAPID_KEY || '',
-    URL: 'https://theultimatenews.xyz',
+    URL: 'http://localhost:3001',
     SENTRY_DNS: process.env.SENTRY_DNS || '',
     PAY_STACK_SECRET: process.env.PAY_STACK_SECRET || '',
-    returnUrl: 'http://localhost:3001/subscription/payment/verify',
+    returnUrl: 'http://localhost:3001/subscription',
 }
 
 const prodConfigs = {

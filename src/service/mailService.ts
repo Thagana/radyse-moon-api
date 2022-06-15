@@ -21,11 +21,16 @@ class sendMail {
   async send(): Promise<boolean> {
     try {
       const transporter = nodemailer.createTransport({
-        service: 'gmail',
+        host: 'smtp.mail.yahoo.com',
+        port: 465,
+        service:'yahoo',
+        secure: false,
         auth: {
           user: configs.MAIL_USER_NAME,
           pass: configs.MAIL_PASSWORD,
         },
+        debug: false,
+        logger: true
       });
       const message = {
         from: configs.MAIL_USER_NAME,
@@ -50,11 +55,16 @@ class sendMail {
   static async sendContactInformation(email: string, name: string, message: string) {
     try {
       const transporter = nodemailer.createTransport({
-        service: 'gmail',
+        host: 'smtp.mail.yahoo.com',
+        port: 465,
+        service:'yahoo',
+        secure: false,
         auth: {
           user: configs.MAIL_USER_NAME,
           pass: configs.MAIL_PASSWORD,
         },
+        debug: false,
+        logger: true
       });
       const data = {
         from: configs.MAIL_USER_NAME,
@@ -77,11 +87,16 @@ class sendMail {
   static async sendMailingUpdate(email: string) {
     try {
       const transporter = nodemailer.createTransport({
-        service: 'gmail',
+        host: 'smtp.mail.yahoo.com',
+        port: 465,
+        service:'yahoo',
+        secure: false,
         auth: {
           user: configs.MAIL_USER_NAME,
           pass: configs.MAIL_PASSWORD,
         },
+        debug: false,
+        logger: true
       });
       const data = {
         from: configs.MAIL_USER_NAME,
@@ -107,11 +122,16 @@ class sendMail {
   static async sendMailNotification(email: string, articles: DataFrame[]) {
     try {
       const transporter = nodemailer.createTransport({
-        service: 'gmail',
+        host: 'smtp.mail.yahoo.com',
+        port: 465,
+        service:'yahoo',
+        secure: false,
         auth: {
           user: configs.MAIL_USER_NAME,
           pass: configs.MAIL_PASSWORD,
         },
+        debug: false,
+        logger: true
       });
       
       const html = await ejs.renderFile(path.join(__dirname, '../views/emails.ejs'), { data: articles }, {async: true});
