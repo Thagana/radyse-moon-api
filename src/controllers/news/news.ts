@@ -33,6 +33,8 @@ const headlines = async (
 
     const data = await fetchNews(id, page, size);
 
+    console.log('XXXXXX', data.success, id, page, size);
+    
     if (!data.success) {
       return response.status(400).json({
         success: false,

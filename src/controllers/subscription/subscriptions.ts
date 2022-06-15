@@ -68,11 +68,9 @@ const getSubscription = async (request: Request, response: Response) => {
       const subscriptions = await PayStackInst.getSubscriptions(subs[i].subscription_code);
       subsArray.push(subscriptions.data);
     }
-
+    
     const plans = await Plan.find({});
     
-    console.log('XXX-XXX', subsArray);
-
     const merged = subsArray.map((i) => {
       const item = plans.find((a) => a.id === i.plan);
       return {
