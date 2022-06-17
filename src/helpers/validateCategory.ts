@@ -3,7 +3,6 @@ const validate = (title: string) => {
     if (!CATEGORY.includes(title)) {
         return false;
     }
-    console.log(title);
     return true;
 }
 

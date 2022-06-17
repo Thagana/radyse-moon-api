@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import logger from '../utils/logger';
 
 const tokenRequired = (request: Request, response: Response, next: NextFunction): Response | void => {
   const authHeader = request.headers.authorization;
@@ -15,7 +16,7 @@ const tokenRequired = (request: Request, response: Response, next: NextFunction)
 
   jwt.verify(token, secret, (err, user) => {
     if (err) {
-      console.log(err)
+      logger.error(err)
       return response
         .status(403)  
         .json({ success: false, message: 'Access denied' });
