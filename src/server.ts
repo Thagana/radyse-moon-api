@@ -6,6 +6,7 @@ import routes from "./routers/routers";
 import db from "./configs/db.mongodb";
 import newSaveCron from "./Jobs/saveNews";
 import loggerMiddleware from "./middleware/logger";
+import logger from "./utils/logger";
 
 dotenv.config();
 
@@ -16,8 +17,8 @@ if (!process.env.PORT) {
 const PORT: number = parseInt(process.env.PORT as string, 10);
 
 db.on("error", console.error.bind(console, "MongoDB connection error:"));
-db.on("connected", () => console.log("Connect to Mongodb Database"));
-db.on("disconnected", () => console.log("Database disconnected"));
+db.on("connected", () => logger.info("Connect to Mongodb Database"));
+db.on("disconnected", () => logger.error("Database disconnected"));
 
 const app = express();
 

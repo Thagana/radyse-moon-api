@@ -40,7 +40,6 @@ const login = async (
     });
   } catch (error) {
     logger.error((error as Error).stack || error);
-    console.log(error);
     return response.status(400).json({
       success: false,
       message: "Something went wrong",

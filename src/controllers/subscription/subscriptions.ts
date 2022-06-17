@@ -58,36 +58,40 @@ const getSubscription = async (request: Request, response: Response) => {
         message: "Access denied",
       });
     }
-    const subs = await Subscription.find({
+    const subs = await Subscription.findOne({
       user_id: id,
+      status: 'active'
     });
-    const subsArray: any[] = [];
+
+    if (!subs) {
+      return response.status(200).json({
+        success: false,
+        message: 'Subscription not found'
+      })
+    }
+
     const PayStackInst = new PayStack(configs.PAY_STACK_SECRET);
 
-    for (let i = 0; i < subs.length; i++) {
-      const subscriptions = await PayStackInst.getSubscriptions(subs[i].subscription_code);
-      subsArray.push(subscriptions.data);
-    }
-    
-    const plans = await Plan.find({});
-    
-    const merged = subsArray.map((i) => {
-      const item = plans.find((a) => a.id === i.plan);
-      return {
-        name: item?.name,
-        interval: item?.interval,
-        currency: item?.currency,
-        amount: i.amount,
-        customer: i.customer,
-        plan: i.plan,
-        status: i.status,
-        id: i.id,
-        token: i.email_token,
-        domain: i.domain,
-        code: i.subscription_code,
-        next_payment_date: i.next_payment_date,
-      };
+    const subscriptions = await PayStackInst.getSubscriptions(subs.subscription_code);
+
+    const plan = await Plan.findOne({
+      id: subscriptions.data.plan.id
     });
+
+    const merged = {
+        name: plan?.name || 'PLAN NAME',
+        interval: plan?.interval || 'INTERVAL',
+        currency: plan?.currency || 'CURRENCY',
+        amount: subscriptions.data.amount,
+        customer: subscriptions.data.customer,
+        plan: subscriptions.data.plan,
+        id: subscriptions.data.id,
+        token: subscriptions.data.email_token,
+        domain: subscriptions.data.domain,
+        code: subscriptions.data.subscription_code,
+        next_payment_date: subscriptions.data.next_payment_date,
+        status: subscriptions.data.status
+    };
 
 
     return response.status(200).json({
@@ -247,7 +251,6 @@ const verifyTransactions = async (request: Request, response: Response) => {
       data: subs.data,
     });
   } catch (error) {
-    console.log(error);
     logger.error(error);
     return response.status(400).json({
       success: false,
@@ -325,6 +328,7 @@ const disableSubscription = async (request: Request, response: Response) => {
       });
     }
     const PayStackInst = new PayStack(configs.PAY_STACK_SECRET);
+
     const disable = await PayStackInst.disableSubscription(code, token);
 
     if (!disable.status) {
@@ -333,12 +337,18 @@ const disableSubscription = async (request: Request, response: Response) => {
         message: "Could not disable subscription",
       });
     }
+
+    await Subscription.updateOne({
+        subscription_code: code,
+    }, {
+      status: 'cancelled'
+    })
+
     return response.status(200).json({
       success: true,
       message: disable.message,
     });
   } catch (error) {
-    console.log(error);
     logger.error(error);
     return response.status(400).json({
       success: false,
@@ -379,7 +389,6 @@ const enableSubscription = async (request: Request, response: Response) => {
       message: disable.message,
     });
   } catch (error) {
-    console.log(error);
     logger.error(error);
     return response.status(400).json({
       success: false,

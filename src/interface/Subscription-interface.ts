@@ -117,7 +117,7 @@ export interface Data {
 export interface Subscriptions {
   status: boolean;
   message: string;
-  data: Array<Data>;
+  data: Data;
   meta: {
     total: number;
     skipped: number;

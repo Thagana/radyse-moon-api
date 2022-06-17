@@ -1,4 +1,5 @@
 import { Sequelize } from "sequelize";
+import logger from "../utils/logger";
 import configs from "./db.configs";
 
 const { DATABASE_CONNECTION } = configs;
@@ -8,7 +9,7 @@ const db = new Sequelize(DATABASE_CONNECTION);
 export const SQ = db;
 
 db.authenticate()
-  .then(() => console.log("Successfully connected to the database"))
-  .catch((error) => console.log(error));
+  .then(() => logger.info("Successfully connected to the database"))
+  .catch((error) => logger.error(error));
 
 export default db;
