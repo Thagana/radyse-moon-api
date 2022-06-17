@@ -321,6 +321,8 @@ const disableSubscription = async (request: Request, response: Response) => {
         message: "Access denied",
       });
     }
+    const subCode = String(code);
+
     if (!code || !token) {
       return response.status(400).json({
         success: false,
@@ -339,7 +341,7 @@ const disableSubscription = async (request: Request, response: Response) => {
     }
 
     await Subscription.updateOne({
-        subscription_code: code,
+        subscription_code: subCode,
     }, {
       status: 'cancelled'
     })
