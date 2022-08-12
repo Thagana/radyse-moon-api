@@ -14,7 +14,7 @@ if (!process.env.PORT) {
   process.exit(1);
 }
 
-const PORT: number = parseInt(process.env.PORT as string, 10);
+const PORT: number = parseInt(process.env.PORT as string, 10) || 5001;
 
 db.on("error", console.error.bind(console, "MongoDB connection error:"));
 db.on("connected", () => logger.info("Connect to Mongodb Database"));
@@ -34,5 +34,5 @@ routes(app);
 newSaveCron.start();
 
 app.listen(PORT, () => {
-  console.log(`Application running successfully on ${PORT}`);
+  console.log(`Application running successfully on http://localhost:${PORT}`);
 });
