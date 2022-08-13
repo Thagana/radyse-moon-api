@@ -1,5 +1,5 @@
 import { Schema , model, Mixed} from "mongoose";
-import { SubscriptionData } from '../../interface/Subscription-interface'
+import { SubscriptionData } from '../../../../interface/Subscription-interface'
 
 const schema = new Schema<SubscriptionData>({
     amount: {

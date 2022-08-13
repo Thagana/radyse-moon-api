@@ -3,12 +3,12 @@ import axios from "axios";
 import { v4 } from "uuid";
 import urlBuilder from "../helpers/urlBuilder";
 import insertIntoDB from "../helpers/insertIntoDB";
-import NewsSettings from "../models/Mongodb/NewsSettings";
+import NewsSettings from "../data/infrastructure/db/entities/Mongodb/NewsSettings";
 import cron from "node-cron";
-import PushTokens from "../models/Mongodb/PushTokens";
+import PushTokens from "../data/infrastructure/db/entities/Mongodb/PushTokens";
 import sendPushNotification from "../helpers/sendPushNotification";
 import sentMailNotification from "../helpers/sendMailNotification";
-import UserModel from "../models/Mongodb/Users";
+import UserModel from "../data/infrastructure/db/entities/Mongodb/Users";
 import sendWebPushNotification from "../helpers/sendWebPushNotification";
 
 interface ArticleResponse {

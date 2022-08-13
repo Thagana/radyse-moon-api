@@ -3,8 +3,8 @@ import sentMailNotification from "../helpers/sendMailNotification";
 import sendPushNotification from "../helpers/sendPushNotification";
 import sendWebPushNotification from "../helpers/sendWebPushNotification";
 import DataFrame from "../interface/data-frame-interface";
-import ArticleModel from "../models/Mongodb/Articles";
-import PushToken from "../models/Mongodb/PushTokens";
+import ArticleModel from "../data/infrastructure/db/entities/Articles";
+import PushToken from "../data/infrastructure/db/entities/Mongodb/PushTokens";
 
 const renderer = async (req: Request, res: Response) => {
   try {

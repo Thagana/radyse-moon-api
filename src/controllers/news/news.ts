@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import fetchNews from "../../service/newsService";
+import fetchNews from "../../services/newsService";
 import logger from "../../utils/logger";
 import axios from "axios";
 import { configs } from "../../configs/app.configs";

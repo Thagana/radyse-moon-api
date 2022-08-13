@@ -1,38 +1,50 @@
+import { Database } from "./data/infrastructure/db";
 import * as dotenv from "dotenv";
-import express from "express";
-import helmet from "helmet";
-import cors from "cors";
-import routes from "./routers/routers";
-import db from "./configs/db.mongodb";
-import newSaveCron from "./Jobs/saveNews";
-import loggerMiddleware from "./middleware/logger";
 import logger from "./utils/logger";
+import signals from "./signals";
 
-dotenv.config();
+// Interfaces
+import { IAuthenticationRepository } from "./domain/auth/auth.repository";
 
-if (!process.env.PORT) {
-  process.exit(1);
-}
+// DOMAIN -> BUSINESS LOGIC
+import { authServiceFactory } from "./domain/auth/auth.service";
 
-const PORT: number = parseInt(process.env.PORT as string, 10);
+// REPOSITORY -> ADAPTOR TO FETCH RESOURCE FROM THE ENTITIES/MODEL/DATABASE
+import { authServiceRepository } from "./data/repositories/auth";
+import { appServerFactory } from "./presentation/http/app";
 
-db.on("error", console.error.bind(console, "MongoDB connection error:"));
-db.on("connected", () => logger.info("Connect to Mongodb Database"));
-db.on("disconnected", () => logger.error("Database disconnected"));
+dotenv.config({ path: '../.env' });
 
-const app = express();
+const db = new Database(process.env.DATABASE_URI || '');
 
-app.set("view engine", "ejs");
+// INIT -> REPOSITORY
+const authenticationRepository: IAuthenticationRepository =
+  authServiceRepository.init();
 
-app.use(helmet());
-app.use(cors());
-app.use(express.json());
-app.use(loggerMiddleware);
-
-routes(app);
-
-newSaveCron.start();
-
-app.listen(PORT, () => {
-  console.log(`Application running successfully on ${PORT}`);
+const authService = authServiceFactory.init({
+  authenticationRepository,
 });
+
+const app = appServerFactory.init({
+  authService,
+});
+
+let server = app.listen(process.env.PORT, () => {
+  logger.info(`Listening on *:${process.env.PORT}`);
+});
+
+const shutdown = signals.init(async () => {
+  await db.close();
+  server.close();
+});
+
+(async () => {
+  try {
+    db.authenticate();
+  } catch (error) {
+    await shutdown();
+  }
+})();
+
+process.on("SIGINT", shutdown);
+process.on("SIGTERM", shutdown);

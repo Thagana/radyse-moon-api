@@ -2,12 +2,12 @@ import { Request, Response } from "express";
 import parser from "ua-parser-js";
 import jwt from "jsonwebtoken";
 import logger from "../../utils/logger";
-import User from "../../models/Mongodb/Users";
+import User from "../../data/infrastructure/db/entities/Mongodb/Users";
 import { configs } from "../../configs/app.configs";
-import NewsSettings from "../../models/Mongodb/NewsSettings";
-import Mail from "../../service/mailService";
+import NewsSettings from "../../data/infrastructure/db/entities/Mongodb/NewsSettings";
+import Mail from "../../services/mailService";
 import tokenGenerator from "../../helpers/tokenGenerator";
-import UserMeta from "../../models/Mongodb/UserMeta";
+import UserMeta from "../../data/infrastructure/db/entities/Mongodb/UserMeta";
 
 const login = async (
   request: Request,

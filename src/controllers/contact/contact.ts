@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import logger from '../../utils/logger';
-import Mail from '../../service/mailService';
+import Mail from '../../services/mailService';
 
 const contact = async (request: Request, response: Response) => {
     try {

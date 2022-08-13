@@ -1,16 +1,16 @@
 import { Request, Response } from "express";
-import NewsSettings from "../../models/Mongodb/NewsSettings";
-import WeatherLocation from "../../models/Mongodb/WeatherLocation";
+import NewsSettings from "../../data/infrastructure/db/entities/Mongodb/NewsSettings";
+import WeatherLocation from "../../data/infrastructure/db/entities/Mongodb/WeatherLocation";
 import fetchWeather from "../../Jobs/fetchWeather";
 import logger from "../../utils/logger";
-import Tokens from "../../models/Mongodb/PushTokens";
-import UserModel from "../../models/Mongodb/Users";
+import Tokens from "../../data/infrastructure/db/entities/Mongodb/PushTokens";
+import UserModel from "../../data/infrastructure/db/entities/Mongodb/Users";
 import updateUserDetails from "../../helpers/updateUserDetails";
 import updateEmailNotification from "../../helpers/updateEmailNotification";
 import updateWebPushNotification from "../../helpers/updateWebPushNotification";
 import webpush from "web-push";
 import { configs } from '../../configs/app.configs';
-import PushToken from "../../models/Mongodb/PushTokens";
+import PushToken from "../../data/infrastructure/db/entities/Mongodb/PushTokens";
 
 const pushNotificationService = async (userId: string, token: string) => {
   try {

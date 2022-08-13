@@ -1,5 +1,5 @@
 import logger from "../utils/logger";
-import News from '../models/Mongodb/Articles';
+import News from '../data/infrastructure/db/entities/Articles';
 
 interface Articles {
     id: string;

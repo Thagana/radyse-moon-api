@@ -1,5 +1,5 @@
 import logger from "../utils/logger";
-import ArticleModel from "../models/Mongodb/Articles";
+import ArticleModel from "../data/infrastructure/db/entities/Articles";
 
 interface DataFormat {
   id: string;
