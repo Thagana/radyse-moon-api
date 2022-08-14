@@ -13,7 +13,7 @@ interface UserMetaAttributes {
   os_version: string;
   engine_name: string;
   cpu_architecture: string;
-  user_id: string;
+  user_id: number;
 }
 
 type UserMetaCreationAttributes = Optional<UserMetaAttributes, "id">;
@@ -31,7 +31,7 @@ class UserMeta
   public os_name!: string;
   public os_version!: string;
   public cpu_architecture!: string;
-  public user_id!: string;
+  public user_id!: number;
   public engine_name!: string;
 }
 
@@ -90,3 +90,5 @@ UserMeta.init(
     timestamps: false,
   }
 );
+
+export default UserMeta;

@@ -3,8 +3,8 @@ import { Database } from "../index";
 import config from '../../../../configs/db.configs';
 
 export interface NewsSettingsAttribute {
-    id: string;
-    user_id: string;
+    id: number;
+    user_id: number;
     language: string;
     location: string;
     category: string;
@@ -18,8 +18,8 @@ export interface NewsSettingsAttribute {
 type NewsSettingsCreationAttributes = Optional<NewsSettingsAttribute, 'id' | 'frequency'| 'push_enabled'| 'email_notification' | 'sms_notification' | 'web_push_notification'>;
 
 class NewsSettings extends Model<NewsSettingsAttribute, NewsSettingsCreationAttributes> implements NewsSettingsAttribute {
-    public id!: string;
-    public user_id!: string;
+    public id!: number;
+    public user_id!: number;
     public language!: string;
     public location!: string;
     public category!: string;
@@ -78,4 +78,6 @@ NewsSettings.init({
     tableName: "news_settings",
     sequelize: new Database(config.DATABASE_URI).sequelize!,
     timestamps: false,
-})
+});
+
+export default NewsSettings;

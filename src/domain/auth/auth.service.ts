@@ -1,13 +1,14 @@
 import { IRepositories } from "../../interface/IRepository";
-import { LoginResponse } from "../../interface/IResponse";
+import { LoginResponse, RegisterResponse } from "../../interface/IResponse";
 import { User } from "../users/model";
-
-// REPOSITORY INTERFACES
-import { ICreateUser } from "../users/user.repository";
+import { IncomingHttpHeaders } from "http";
 
 // SERVICE INTERFACE
 export interface IAuthService {
-  // register(createUserDto: ICreateUser): Promise<User>;
+  register(
+    email: string,
+    headers: IncomingHttpHeaders
+  ): Promise<RegisterResponse>;
   login(code: string): Promise<LoginResponse>;
 }
 
@@ -18,9 +19,78 @@ interface IAuthServiceFactory {
 
 export const authServiceFactory: IAuthServiceFactory = {
   init(repositories: IRepositories) {
-    // async function register(user: ICreateUser): Promise<User> {
-    //   return repositories.userRepository.createUser(user);
-    // }
+    async function register(
+      email: string,
+      headers: IncomingHttpHeaders
+    ): Promise<RegisterResponse> {
+      try {
+        const user = await repositories.userRepository.findUser(email);
+
+        const rand = () => Math.round(Math.random() * 10);
+
+        const token = tokenGenerator(rand);
+
+        if (user) {
+          const sent = await sendVerificationCode(user, token);
+          if (!sent.success) {
+            return {
+              success: false,
+              message: "Could not sent mail",
+            };
+          }
+
+          const updateToken = await repositories.userRepository.updateToken(
+            token,
+            user
+          );
+
+          if (!updateToken) {
+            return {
+              success: false,
+              message: "Failed to update token",
+            };
+          }
+          return {
+            success: true,
+            message: "Please check email, a verification code has been sent",
+          };
+        }
+
+        return repositories.userRepository.createUser(email, token, headers);
+      } catch (error) {
+        console.log(error);
+        return {
+          success: false,
+          message: "Something went wrong, please try again later",
+        };
+      }
+    }
+
+    function tokenGenerator(rand: () => number) {
+      let val = "";
+      for (let i = 0; i < 5; i += 1) {
+        val += `${rand()}`;
+      }
+      return val;
+    }
+
+    async function sendVerificationCode(user: User, token: string) {
+      const mailer = await repositories.authenticationRepository.sendMail(
+        "NOT_UPDATED_USER",
+        user.email,
+        token
+      );
+      if (!mailer) {
+        return {
+          success: false,
+          message: "Failed to send mail",
+        };
+      }
+      return {
+        success: true,
+        message: "Please check email, for verification code",
+      };
+    }
 
     async function login(code: string): Promise<LoginResponse> {
       return new Promise((resolve, reject) => {
@@ -39,8 +109,9 @@ export const authServiceFactory: IAuthServiceFactory = {
                 message: "Could not find user token",
               });
             }
-            const jwtToken =
-              repositories.authenticationRepository.getJwtToken(response as User);
+            const jwtToken = repositories.authenticationRepository.getJwtToken(
+              response as User
+            );
 
             resolve({
               success: true,
@@ -53,6 +124,7 @@ export const authServiceFactory: IAuthServiceFactory = {
     }
 
     return {
+      register,
       login,
     };
   },

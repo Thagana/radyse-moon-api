@@ -1,16 +1,9 @@
-import { LoginResponse } from '../../interface/IResponse';
-import { User } from './model';
-
-export interface ICreateUser {
-  name: string,
-  surname: string,
-  username: string,
-  email: string,
-  password: string,
-}
-
-
+import {User} from './model';
+import { RegisterResponse } from '../../interface/IResponse';
+import { IncomingHttpHeaders } from "http";
 
 export interface IUsersRepository {
-  createUser(createUserDto: ICreateUser): Promise<User>;
+  createUser(email: string, token: string, headers: IncomingHttpHeaders): Promise<RegisterResponse>;
+  findUser(email: string): Promise<User | false>;
+  updateToken(token: string, user: User): Promise<boolean>;
 }

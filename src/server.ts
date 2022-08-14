@@ -11,7 +11,9 @@ import { authServiceFactory } from "./domain/auth/auth.service";
 
 // REPOSITORY -> ADAPTOR TO FETCH RESOURCE FROM THE ENTITIES/MODEL/DATABASE
 import { authServiceRepository } from "./data/repositories/auth";
+
 import { appServerFactory } from "./presentation/http/app";
+import { userServiceRepository } from "./data/repositories/user";
 
 dotenv.config({ path: '../.env' });
 
@@ -20,9 +22,11 @@ const db = new Database(process.env.DATABASE_URI || '');
 // INIT -> REPOSITORY
 const authenticationRepository: IAuthenticationRepository =
   authServiceRepository.init();
+const userRepository = userServiceRepository.init();
 
 const authService = authServiceFactory.init({
   authenticationRepository,
+  userRepository
 });
 
 const app = appServerFactory.init({

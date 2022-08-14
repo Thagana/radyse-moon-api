@@ -7,4 +7,5 @@ export interface IAuthenticationRepository {
   //   verifyToken(token: string, secret: string): Promise<JwtPayload>;
   getValidateCode(code: string): Promise<User | boolean>;
   getJwtToken(user: User): string;
+  sendMail(username: string, email: string, password: string): Promise<boolean>;
 }

@@ -4,6 +4,7 @@ import { User } from "../../../domain/users/model";
 import UserDOA from "../../infrastructure/db/entities/User";
 
 import { IAuthenticationRepository } from "../../../domain/auth/auth.repository";
+import { Mailer } from "../../../helpers/Mailer/Mailer";
 
 interface IAuthRepositoryFactory {
   init(): IAuthenticationRepository;
@@ -32,10 +33,29 @@ export const authServiceRepository: IAuthRepositoryFactory = {
           .catch((error) => reject(error));
       });
     }
+    async function sendMail(username: string, email: string, token: string) {
+      return new Promise<boolean>((resolve, reject) => {
+        const mailer = new Mailer(username, email, token);
+        mailer.sendVerifyEmail().then(results => {
+          if (results) {
+            resolve(true);
+          } else {
+            resolve(false);
+          }
+        }).catch(error => reject(error))
+      })
+    }
+    async function createUser(email: string) {
+      return new Promise((resolve, reject) => {
+        //
+      })
+    }
+
 
     return {
       getJwtToken,
       getValidateCode,
+      sendMail
     };
   },
 };
