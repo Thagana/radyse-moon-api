@@ -8,13 +8,14 @@ import NewsSettings from "../../models/Mongodb/NewsSettings";
 import Mail from "../../service/mailService";
 import tokenGenerator from "../../helpers/tokenGenerator";
 import UserMeta from "../../models/Mongodb/UserMeta";
+import PushToken from "../../models/Mongodb/PushTokens";
 
 const login = async (
   request: Request,
   response: Response
 ): Promise<Response> => {
   try {
-    const { code } = request.body;
+    const { code, token } = request.body;
     if (!code) {
       return response.status(400).json({
         success: false,
@@ -32,8 +33,18 @@ const login = async (
         message: "User not found",
       });
     }
+    
+    if (token) {
+        await PushToken.updateOne({
+          user_id: user._id
+        }, {
+          token: token
+        });
+    }
+
     // LOGIN
     const jwtToken = await jwt.sign({ id: user._id }, configs.TOKEN_SECRET);
+    
     return response.status(200).json({
       success: true,
       token: jwtToken,
