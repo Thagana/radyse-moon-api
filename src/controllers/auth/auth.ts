@@ -34,11 +34,13 @@ const login = async (
       });
     }
     
-    await PushToken.updateOne({
-      user_id: user._id
-    }, {
-      token: token
-    });
+    if (token) {
+        await PushToken.updateOne({
+          user_id: user._id
+        }, {
+          token: token
+        });
+    }
 
     // LOGIN
     const jwtToken = await jwt.sign({ id: user._id }, configs.TOKEN_SECRET);
