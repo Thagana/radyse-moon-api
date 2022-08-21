@@ -63,8 +63,8 @@ const shutdown = signals.init(async () => {
 
 (async () => {
   try {
-    db.authenticate();
-    mongodb.connect();
+    await db.authenticate();
+    await mongodb.connect();
   } catch (error) {
     await shutdown();
   }
