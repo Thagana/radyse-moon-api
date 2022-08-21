@@ -2,6 +2,7 @@ import { IRepositories } from "../../interface/IRepository";
 import { LoginResponse, RegisterResponse } from "../../interface/IResponse";
 import { User } from "../users/model";
 import { IncomingHttpHeaders } from "http";
+import  crypto from 'crypto';
 
 // SERVICE INTERFACE
 export interface IAuthService {
@@ -26,7 +27,11 @@ export const authServiceFactory: IAuthServiceFactory = {
       try {
         const user = await repositories.userRepository.findUser(email);
 
-        const rand = () => Math.round(Math.random() * 10);
+        const rand = () => {
+          const token = crypto.randomBytes(1);
+          const hex = token.toString('hex');
+          return parseInt(hex, 16);
+        };
 
         const token = tokenGenerator(rand);
 
