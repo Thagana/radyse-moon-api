@@ -2,13 +2,13 @@ import http from 'http';
 import express from 'express';
 import cors from 'cors';
 import compression from 'compression';
-import bodyParser from 'body-parser';
 import helmet from 'helmet';
 import path from 'path';
 import { expressjwt } from 'express-jwt';
 import { AuthRouter } from './routes/auth.routes';
 import { IServices } from '../../interface/IService';
 import {configs} from '../../configs/app.configs';
+import { NewsRoutes } from './routes/news.router';
 
 const { TOKEN_SECRET } = configs;
 
@@ -18,8 +18,8 @@ const app = express();
 
 app.disable('x-powered-by');
 app.use(helmet());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json({ limit: '5mb' }));
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json({ limit: '5mb' }));
 app.use(compress);
 app.use(cors());
 
@@ -34,6 +34,7 @@ export const appServerFactory = {
         path: ['/auth/register', '/auth/login'],
       }));
     app.use('/auth', AuthRouter.init(services));
+    app.use('/news', NewsRoutes.init(services))
     return http.createServer(app);
   },
 };
