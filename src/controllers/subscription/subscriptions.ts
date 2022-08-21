@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
 import PayStack from "../../helpers/PayStack/PayStack";
-import Subscription from "../../models/Mongodb/Subscription";
+import Subscription from "../../data/infrastructure/db/entities/Subscription";
 import logger from "../../utils/logger";
 import { configs } from "../../configs/app.configs";
-import Plan from "../../models/Mongodb/Plan";
+import Plan from "../../data/infrastructure/db/entities/Plan";
 import getPlan from "../../helpers/getplan";
-import UserModel from "../../models/Mongodb/Users";
+import UserModel from "../../data/infrastructure/db/entities/Mongodb/Users";
 
 const getSubscriptions = async (request: Request, response: Response) => {
   try {

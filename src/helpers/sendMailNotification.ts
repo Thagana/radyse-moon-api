@@ -1,4 +1,4 @@
-import Mail from '../service/mailService';
+import Mail from '../services/mailService';
 import logger from '../utils/logger';
 
 import DataFrame from '../interface/data-frame-interface';

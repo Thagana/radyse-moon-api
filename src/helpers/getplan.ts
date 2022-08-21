@@ -1,4 +1,4 @@
-import Plan from "../models/Mongodb/Plan";
+import Plan from "../data/infrastructure/db/entities/Plan";
 
 const getPlan = async (
   name: string,

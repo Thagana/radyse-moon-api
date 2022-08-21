@@ -1,35 +1,74 @@
+import { INewsServiceFactory } from "./domain/news/news.service";
+import { INewsRepository } from "./domain/news/news.repository";
+import { Database } from "./data/infrastructure/db";
+import { Database as Mongodb } from './data/infrastructure/db/mongodb';
 import * as dotenv from "dotenv";
-import express from "express";
-import helmet from "helmet";
-import cors from "cors";
-import routes from "./routers/routers";
-import db from "./configs/db.mongodb";
-import loggerMiddleware from "./middleware/logger";
 import logger from "./utils/logger";
+import signals from "./signals";
 
-dotenv.config();
+// Interfaces
+import { IAuthenticationRepository } from "./domain/auth/auth.repository";
 
-if (!process.env.PORT) {
-  process.exit(1);
-}
+// DOMAIN -> BUSINESS LOGIC
+import { authServiceFactory } from "./domain/auth/auth.service";
+import { appServerFactory } from "./presentation/http/app";
+import { newsServiceFactory } from "./domain/news/news.service";
 
-const PORT: number = parseInt(process.env.PORT as string, 10);
+// REPOSITORY -> ADAPTOR TO FETCH RESOURCE FROM THE ENTITIES/MODEL/DATABASE
 
-db.on("error", console.error.bind(console, "MongoDB connection error:"));
-db.on("connected", () => logger.info("Connect to Mongodb Database"));
-db.on("disconnected", () => logger.error("Database disconnected"));
+import { authServiceRepository } from "./data/repositories/auth";
+import { userServiceRepository } from "./data/repositories/user";
+import { newsServiceRepository } from "./data/repositories/news";
 
-const app = express();
+// domain
+import { IUsersRepository } from "./domain/users/user.repository";
 
-app.set("view engine", "ejs");
+dotenv.config({ path: "../.env" });
 
-app.use(helmet());
-app.use(cors());
-app.use(express.json());
-app.use(loggerMiddleware);
+const db = new Database(process.env.DATABASE_URI || "");
+const mongodb = new Mongodb(process.env.MONGO_DB_URI || "");
 
-routes(app);
+// INIT -> REPOSITORY
+const authenticationRepository: IAuthenticationRepository =
+  authServiceRepository.init();
+const userRepository: IUsersRepository = userServiceRepository.init();
+const newsRepository: INewsRepository = newsServiceRepository.init();
 
-app.listen(PORT, () => {
-  console.log(`Application running successfully on ${PORT}`);
+const authService = authServiceFactory.init({
+  newsRepository,
+  authenticationRepository,
+  userRepository,
 });
+
+const newsService = newsServiceFactory.init({
+  newsRepository,
+  authenticationRepository,
+  userRepository,
+});
+
+const app = appServerFactory.init({
+  authService,
+  newsService,
+});
+
+let server = app.listen(process.env.PORT, () => {
+  logger.info(`Listening on *:${process.env.PORT}`);
+});
+
+const shutdown = signals.init(async () => {
+  await db.close();
+  await mongodb.close()
+  server.close();
+});
+
+(async () => {
+  try {
+    await db.authenticate();
+    await mongodb.connect();
+  } catch (error) {
+    await shutdown();
+  }
+})();
+
+process.on("SIGINT", shutdown);
+process.on("SIGTERM", shutdown);

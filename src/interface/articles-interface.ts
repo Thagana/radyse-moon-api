@@ -1,13 +1,15 @@
-interface Articles {
-    id: string;
-    source: string;
-    image: string;
-    description: string;
-    dateAdded: Date;
-    datePosted: string;
-    author: string;
+interface Article {
+    id: any;
     title: string;
-    location: string;
+    source: string;
+    author: string;
+    url: string;
+    urlToImage: string;
+    dateCreated: string;
+    category: string;
+    description: string;
+    publishedAt: string;
+    country: string;
 }
 
-export default Articles;
+export default Article;
