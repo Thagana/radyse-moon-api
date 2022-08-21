@@ -4,7 +4,6 @@ import helmet from "helmet";
 import cors from "cors";
 import routes from "./routers/routers";
 import db from "./configs/db.mongodb";
-import newSaveCron from "./Jobs/saveNews";
 import loggerMiddleware from "./middleware/logger";
 import logger from "./utils/logger";
 
@@ -30,8 +29,6 @@ app.use(express.json());
 app.use(loggerMiddleware);
 
 routes(app);
-
-newSaveCron.start();
 
 app.listen(PORT, () => {
   console.log(`Application running successfully on ${PORT}`);
