@@ -18,6 +18,7 @@ const devConfigs = {
     SENTRY_DNS: process.env.SENTRY_DNS || '',
     PAY_STACK_SECRET: process.env.PAY_STACK_SECRET || '',
     returnUrl: 'http://localhost:3001/subscription',
+    CRON_KEY: process.env.CRON_KEY || '',
 }
 
 const prodConfigs = {
@@ -36,6 +37,7 @@ const prodConfigs = {
     SENTRY_DNS: process.env.SENTRY_DNS || '',
     PAY_STACK_SECRET: process.env.PAY_STACK_SECRET || '',
     returnUrl: process.env.PAY_STACK_RETURN_URL || '',
+    CRON_KEY: process.env.CRON_KEY || '',
 }
 
 export const configs = process.env.NODE_ENV === 'production' ? prodConfigs : devConfigs;
