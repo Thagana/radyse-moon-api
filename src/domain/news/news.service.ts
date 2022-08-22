@@ -3,7 +3,21 @@ import { IRepositories } from "../../interface/IRepository";
 
 export interface INewsService {
   headlines(id: number, page: string, size: string): Promise<Article[]>;
-  allNews(id: number, page: string, size: string): Promise<Article[]>;
+  allNews(
+    id: number,
+    page: string,
+    size: string
+  ): Promise<
+    | {
+        success: boolean;
+        data: Article[];
+        message?: undefined;
+      }
+    | {
+        success: boolean;
+        error: unknown;
+      }
+  >;
 }
 
 export interface INewsServiceFactory {
@@ -20,15 +34,19 @@ export const newsServiceFactory = {
           pageQuery = 1;
           sizeQuery = 10;
         }
-        fetchNews(id, pageQuery, sizeQuery)
+        repositories.newsRepository.getHeadlineArticles()
           .then((response) => {
             resolve(response);
           })
           .catch((error) => reject(error));
       });
     }
-
-    async function fetchNews(id: number, page: number, size: number): Promise<Article[]> {
+    
+    async function fetchNews(
+      id: number,
+      page: number,
+      size: number
+    ): Promise<Article[]> {
       const settings = await repositories.newsRepository.getSettings(id);
       const category = settings.category;
       const location = settings.location;
@@ -50,14 +68,24 @@ export const newsServiceFactory = {
     }
 
     async function allNews(id: number, page: string, size: string) {
-      let pageQuery = page as unknown as number;
-      let sizeQuery = size as unknown as number;
-      if (!pageQuery || !sizeQuery) {
-        pageQuery = 1;
-        sizeQuery = 10;
+      try {
+        let pageQuery = page as unknown as number;
+        let sizeQuery = size as unknown as number;
+        if (!pageQuery || !sizeQuery) {
+          pageQuery = 1;
+          sizeQuery = 10;
+        }
+        const news = await fetchNews(id, pageQuery, sizeQuery);
+        return {
+          success: true,
+          data: news,
+        };
+      } catch (error) {
+        return {
+          success: false,
+          error,
+        };
       }
-      const news = await fetchNews(id, pageQuery, sizeQuery);
-      return news;
     }
     return {
       headlines,
