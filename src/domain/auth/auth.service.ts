@@ -60,8 +60,8 @@ export const authServiceFactory: IAuthServiceFactory = {
             message: "Please check email, a verification code has been sent",
           };
         }
-
-        return repositories.userRepository.createUser(email, token, headers);
+        const createUser = await repositories.userRepository.createUser(email, token, headers);
+        return createUser;
       } catch (error) {
         console.log(error);
         return {

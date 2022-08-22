@@ -33,29 +33,17 @@ export const authServiceRepository: IAuthRepositoryFactory = {
           .catch((error) => reject(error));
       });
     }
-    async function sendMail(username: string, email: string, token: string) {
+    
+    async function sendMail(email: string, token: string) {
       return new Promise<boolean>((resolve, reject) => {
-        const mailer = new Mailer(username, email, token);
-        mailer.sendVerifyEmail().then(results => {
-          if (results) {
-            resolve(true);
-          } else {
-            resolve(false);
-          }
-        }).catch(error => reject(error))
-      })
+        Mailer.sendVerifyEmail(email, token).then(() => {resolve(true)}).catch((error: any) => reject(error));
+      });
     }
-    async function createUser(email: string) {
-      return new Promise((resolve, reject) => {
-        //
-      })
-    }
-
 
     return {
       getJwtToken,
       getValidateCode,
-      sendMail
+      sendMail,
     };
   },
 };
