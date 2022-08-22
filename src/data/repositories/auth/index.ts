@@ -35,8 +35,7 @@ export const authServiceRepository: IAuthRepositoryFactory = {
     }
     async function sendMail(username: string, email: string, token: string) {
       return new Promise<boolean>((resolve, reject) => {
-        const mailer = new Mailer(username, email, token);
-        mailer.sendVerifyEmail().then(results => {
+        Mailer.sendVerifyEmail(email, token).then(results => {
           if (results) {
             resolve(true);
           } else {
@@ -45,6 +44,7 @@ export const authServiceRepository: IAuthRepositoryFactory = {
         }).catch(error => reject(error))
       })
     }
+
     async function createUser(email: string) {
       return new Promise((resolve, reject) => {
         //

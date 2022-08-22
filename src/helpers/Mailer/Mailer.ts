@@ -8,7 +8,7 @@ export class Mailer {
     public readonly email: string,
     public readonly token: string
   ) {}
-  public async sendVerifyEmail() {
+  public static async sendVerifyEmail(email: string , token: string) {
     return new Promise<boolean>((resolve, reject) => {
       const transporter = nodemailer.createTransport({
         host: "smtp.mail.yahoo.com",
@@ -24,12 +24,12 @@ export class Mailer {
       });
       const message = {
         from: configs.MAIL_USER_NAME,
-        to: this.email,
+        to: email,
         subject: "verify account",
         html: `<html>
                                 <div>
                                     <div>Welcome to The Ultimate News user the OTP code to verify access<div>
-                                    <div>here: ${this.token}</div>
+                                    <div>here: ${token}</div>
                                     <div>If you did not make this request please ignore</div>
                                 </div>
                       </html>`,

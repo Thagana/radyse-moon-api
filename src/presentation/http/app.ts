@@ -9,6 +9,7 @@ import { AuthRouter } from './routes/auth.routes';
 import { IServices } from '../../interface/IService';
 import {configs} from '../../configs/app.configs';
 import { NewsRoutes } from './routes/news.router';
+import { UserRoutes } from './routes/user.router';
 
 const { TOKEN_SECRET } = configs;
 
@@ -34,7 +35,8 @@ export const appServerFactory = {
         path: ['/auth/register', '/auth/login'],
       }));
     app.use('/auth', AuthRouter.init(services));
-    app.use('/news', NewsRoutes.init(services))
+    app.use('/news', NewsRoutes.init(services));
+    app.use('/user', UserRoutes.init(services))
     return http.createServer(app);
   },
 };
