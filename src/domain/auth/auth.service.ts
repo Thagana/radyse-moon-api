@@ -2,7 +2,6 @@ import { IRepositories } from "../../interface/IRepository";
 import { LoginResponse, RegisterResponse } from "../../interface/IResponse";
 import { User } from "../users/model";
 import { IncomingHttpHeaders } from "http";
-import  crypto from 'crypto';
 
 // SERVICE INTERFACE
 export interface IAuthService {
@@ -27,10 +26,8 @@ export const authServiceFactory: IAuthServiceFactory = {
       try {
         const user = await repositories.userRepository.findUser(email);
 
-        const rand = () => {
-          const token = crypto.randomBytes(1);
-          const hex = token.toString('hex');
-          return parseInt(hex, 16);
+        const rand = (min: number, max: number) => {
+          return Math.floor(Math.random() * (max - min + 1) + min)
         };
 
         const token = tokenGenerator(rand);
@@ -71,10 +68,10 @@ export const authServiceFactory: IAuthServiceFactory = {
       }
     }
 
-    function tokenGenerator(rand: () => number) {
+    function tokenGenerator(rand: (min: number, max: number) => number) {
       let val = "";
       for (let i = 0; i < 5; i += 1) {
-        val += `${rand()}`;
+        val += `${rand(0, 10)}`;
       }
       return val;
     }
