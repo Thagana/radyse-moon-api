@@ -10,6 +10,7 @@ export interface IUsersRepository {
   ): Promise<RegisterResponse>;
   findUser(email: string): Promise<User | false>;
   updateToken(token: string, user: User): Promise<boolean>;
+  updatePushToken(token: string, user: User, title: string): Promise<boolean>;
   getSettings(id: number): Promise<{
     language: string;
     location: string;
