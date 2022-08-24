@@ -4,7 +4,14 @@ import configs from "./db.configs";
 
 const { DATABASE_CONNECTION } = configs;
 
-const db = new Sequelize(DATABASE_CONNECTION);
+const db = new Sequelize(DATABASE_CONNECTION, {
+    dialectOptions: {
+		ssl: {
+			require: true,
+			rejectUnauthorized: false,
+		},
+	},
+});
 
 export const SQ = db;
 

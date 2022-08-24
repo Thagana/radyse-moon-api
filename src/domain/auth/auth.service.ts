@@ -9,7 +9,7 @@ export interface IAuthService {
     email: string,
     headers: IncomingHttpHeaders
   ): Promise<RegisterResponse>;
-  login(code: string): Promise<LoginResponse>;
+  login(code: string, fcmtoken?: string, title?: string): Promise<LoginResponse>;
 }
 
 // SERVICE FACTORY -> CREATING NEW SERVICE USING THE SERVICE FACTORY PATTERN
@@ -94,23 +94,28 @@ export const authServiceFactory: IAuthServiceFactory = {
       };
     }
 
-    async function login(code: string): Promise<LoginResponse> {
+    async function login(code: string, fcmtoken?: string, title?: string): Promise<LoginResponse> {
       return new Promise((resolve, reject) => {
         repositories.authenticationRepository
           .getValidateCode(code)
-          .then((response) => {
+          .then(async (response) => {
             if (!response) {
               resolve({
                 success: false,
                 message: "User not found",
               });
             }
+            
             if (typeof response === "boolean") {
               resolve({
                 success: false,
                 message: "Could not find user token",
               });
+              return;
             }
+
+            await updateFCMToken(response, fcmtoken, title);
+            
             const jwtToken = repositories.authenticationRepository.getJwtToken(
               response as User
             );
@@ -123,6 +128,16 @@ export const authServiceFactory: IAuthServiceFactory = {
           })
           .catch((error) => reject(error));
       });
+    }
+
+    async function updateFCMToken(user: User, title?: string, fcmtoken?: string) {
+      return new Promise((resolve, reject) => {
+        if (fcmtoken && title) {
+          repositories.userRepository.updatePushToken(fcmtoken, user, title).then(response => {
+            resolve(response);
+          }).catch(error => reject(error));
+        }
+      })
     }
 
     return {

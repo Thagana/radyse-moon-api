@@ -10,7 +10,7 @@ const config = {
   DB_PASSWORD: process.env.DB_PASSWORD || "",
   DB_USER_NAME: process.env.DB_USER_NAME || "",
   MONGO_DB_URI: process.env.MONGO_DB_URI || "",
-  DATABASE_CONNECTION: process.env.DATABASE_CONNECTION || "",
+  DATABASE_CONNECTION: process.env.DATABASE_URI || "",
   DATABASE_URI: process.env.DATABASE_URI || ""
 };
 
