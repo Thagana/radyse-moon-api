@@ -1,0 +1,16 @@
+"use strict";
+// import { Request, Response } from "express";
+// import newsService from "../../service/newsService";
+// import logger from "../../utils/logger";
+// import axios from "axios";
+// import { configs } from "../../configs/app.configs";
+// import { v4 } from "uuid";
+// import NewsSettings from "../../models/Mongodb/NewsSettings";
+// import insertIntoDB from "../../helpers/insertIntoDB";
+// import sentMailNotification from "../../helpers/sendMailNotification";
+// import sendPushNotification from "../../helpers/sendPushNotification";
+// import sendWebPushNotification from "../../helpers/sendWebPushNotification";
+// import urlBuilder from "../../helpers/urlBuilder";
+// import PushTokens from "../../models/Mongodb/PushTokens";
+// import UserModel from "../../models/Mongodb/Users";
+Object.defineProperty(exports, "__esModule", { value: true });
