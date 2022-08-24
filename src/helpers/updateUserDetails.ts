@@ -1,4 +1,4 @@
-import UserModel from "../models/Mongodb/Users";
+import UserModel from "../data/infrastructure/db/entities/Mongodb/Users";
 
 const updateUserDetails = async (firstName: string, lastName: string, id: string) => {
     try {

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import BookMarkModel from "../../models/Mongodb/Bookmarks";
+import BookMarkModel from "../../data/infrastructure/db/entities/Mongodb/Bookmarks";
 import logger from "../../utils/logger";
 
 const bookmarks = async (request: Request, response: Response) => {

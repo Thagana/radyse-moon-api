@@ -1,6 +1,6 @@
 import { Schema, model } from 'mongoose';
 
-interface Article {
+export interface Article {
     source: string;
     image: string;
     description: string;

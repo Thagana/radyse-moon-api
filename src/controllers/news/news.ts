@@ -227,6 +227,10 @@ const fetchNews = async (request: Request, response: Response) => {
         }
       }
     }
+    return response.status(200).json({
+      success: true,
+      message: 'Successfully fetched news articles'
+    })
   } catch (error) {
     logger.error((error as Error).stack || error);
     return response.status(400).json({

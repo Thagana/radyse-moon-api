@@ -1,5 +1,5 @@
 import logger from "../utils/logger";
-import NewsSettings from "../models/Mongodb/NewsSettings";
+import NewsSettings from "../data/infrastructure/db/entities/Mongodb/NewsSettings";
 
 const updateWebPushNotification = async (id: string, state = 1) => {
   try {
