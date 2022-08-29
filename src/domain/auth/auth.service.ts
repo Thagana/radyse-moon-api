@@ -113,7 +113,6 @@ export const authServiceFactory: IAuthServiceFactory = {
               });
               return;
             }
-
             await updateFCMToken(response, fcmtoken, title);
             
             const jwtToken = repositories.authenticationRepository.getJwtToken(
@@ -130,7 +129,14 @@ export const authServiceFactory: IAuthServiceFactory = {
       });
     }
 
-    async function updateFCMToken(user: User, title?: string, fcmtoken?: string) {
+    /**
+     * 
+     * @param user 
+     * @param fcmtoken 
+     * @param title 
+     * @returns 
+     */
+    async function updateFCMToken(user: User, fcmtoken?: string, title?: string, ) {
       return new Promise((resolve, reject) => {
         if (fcmtoken && title) {
           repositories.userRepository.updatePushToken(fcmtoken, user, title).then(response => {
