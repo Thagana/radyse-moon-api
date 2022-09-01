@@ -70,14 +70,41 @@ export const newsServiceRepository: INewsRepositoryFactory = {
         }
       });
     }
-    async function getHeadlineArticles() {
+    async function getHeadlines(category: string, countryISO: string) {
       return new Promise<Article[]>(async (resolve, reject) => {
         try {
           const article = await ArticlesDOA.find({
+            category: category,
+            country: countryISO,
             dateCreated: {
-              $gt: moment(new Date(Date.now() - 24 * 60 * 60 * 1000)).toDate(),
+              $gt: new Date(Date.now() - 24 * 60 * 60 * 1000),
             },
           })
+            .sort({ dateCreated: -1 })
+            .exec();
+          const mapper = article.map((item) => ({
+            id: item.id,
+            title: item.title,
+            source: item.source,
+            author: item.author,
+            url: item.url,
+            urlToImage: item.urlToImage,
+            dateCreated: item.dateCreated,
+            category: item.category,
+            description: item.description,
+            publishedAt: item.publishedAt,
+            country: item.country,
+          }));
+          resolve(mapper);
+        } catch (error) {
+          reject(error);
+        }
+      });
+    }
+    async function getHeadlineArticles() {
+      return new Promise<Article[]>(async (resolve, reject) => {
+        try {
+          const article = await ArticlesDOA.find({})
             .sort({ dateCreated: -1 })
             .exec();
           const mapper = article.map((item) => ({
@@ -102,7 +129,8 @@ export const newsServiceRepository: INewsRepositoryFactory = {
     return {
       getArticles,
       getSettings,
-      getHeadlineArticles,
+      getHeadlines,
+      getHeadlineArticles
     };
   },
 };

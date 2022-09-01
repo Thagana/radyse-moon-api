@@ -12,4 +12,5 @@ export interface INewsRepository {
     countryISO: string
   ): Promise<Article[]>;
   getHeadlineArticles(): Promise<Article[]>
+  getHeadlines(category: string, countryISO: string): Promise<Article[]>;
 }

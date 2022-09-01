@@ -49,7 +49,7 @@ export const appServerFactory = {
       algorithms: ['HS256'],
     })
       .unless({
-        path: ['/auth/register', '/auth/login'],
+        path: ['/auth/register', '/auth/login', '/news/fetch-news'],
       }));
     app.use('/auth', AuthRouter.init(services));
     app.use('/news', NewsRoutes.init(services));

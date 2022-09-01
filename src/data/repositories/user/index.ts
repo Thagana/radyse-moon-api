@@ -4,7 +4,7 @@ import NewsSettingsDOA from "../../infrastructure/db/entities/NewsSettings";
 import UserMetaDOA from "../../infrastructure/db/entities/UserMeta";
 import PushTokensDOA from "../../infrastructure/db/entities/PushTokens";
 import parser from "ua-parser-js";
-
+import { Database } from "../../infrastructure/db/index";
 import { User } from "../../../domain/users/model";
 
 import { IUsersRepository } from "../../../domain/users/user.repository";
@@ -23,28 +23,40 @@ export const userServiceRepository: IUsersRepositoryFactory = {
       token: string,
       headers: IncomingHttpHeaders
     ) {
+      const db = new Database(process.env.DATABASE_URI || "");
+      const transaction = await db.sequelize.transaction();
       return new Promise<RegisterResponse>(async (resolve, reject) => {
         try {
           // CREATE USER
-          const user = await UserDOA.create({
-            first_name: "first_name",
-            last_name: "last_name",
-            email,
-            avatar:
-              "https://avatars.githubusercontent.com/u/68122202?s=400&u=4abc9827a8ca8b9c19b06b9c5c7643c87da51e10&v=4",
-            token: token,
-          });
+          const user = await UserDOA.create(
+            {
+              first_name: "First Name",
+              last_name: "Last Name",
+              email,
+              avatar:
+                "https://avatars.githubusercontent.com/u/68122202?s=400&u=4abc9827a8ca8b9c19b06b9c5c7643c87da51e10&v=4",
+              token: token,
+            },
+            {
+              transaction: transaction,
+            }
+          );
           // CREATE NEWS SETTINGS
-          await NewsSettingsDOA.create({
-            user_id: user.id,
-            language: "en",
-            location: "ZA",
-            frequency: 3,
-            category: "general",
-            push_enabled: 0,
-            email_notification: 0,
-            web_push_notification: 0,
-          });
+          await NewsSettingsDOA.create(
+            {
+              user_id: user.id,
+              language: "en",
+              location: "ZA",
+              frequency: 3,
+              category: "general",
+              push_enabled: 0,
+              email_notification: 0,
+              web_push_notification: 0,
+            },
+            {
+              transaction: transaction,
+            }
+          );
           // CREATE USER META
           const UA = parser(headers["user-agent"]);
           const browserName = UA.browser.name || "X_AVAIL";
@@ -57,37 +69,45 @@ export const userServiceRepository: IUsersRepositoryFactory = {
           const cpuArch = UA.cpu.architecture || "X_AVAIL";
           const engine = UA.engine.name || "X_AVAIL";
 
-          await UserMetaDOA.create({
-            browser_name: browserName,
-            browser_version: browserVersion,
-            device_model: deviceModel,
-            device_vendor: deviceVendor,
-            device_type: deviceType,
-            os_name: osName,
-            os_version: osVersion,
-            cpu_architecture: cpuArch,
-            engine_name: engine,
-            user_id: user.id,
-          });
+          await UserMetaDOA.create(
+            {
+              browser_name: browserName,
+              browser_version: browserVersion,
+              device_model: deviceModel,
+              device_vendor: deviceVendor,
+              device_type: deviceType,
+              os_name: osName,
+              os_version: osVersion,
+              cpu_architecture: cpuArch,
+              engine_name: engine,
+              user_id: user.id,
+            },
+            {
+              transaction: transaction,
+            }
+          );
           // SEND MAIL
-          const mailer = await Mailer.sendVerifyEmail(user.email, token);
-          if (!mailer) {
+          const send = await Mailer.sendVerifyEmail(user.email, token);
+          if (!send) {
+            await transaction.rollback();
             reject({
               success: false,
               message: "Could not send mail",
             });
-          } else {
-            resolve({
-              success: true,
-              message: "Successfully registered",
-            });
+            return;
           }
+          await transaction.commit();
+          resolve({
+            success: true,
+            message: "Successfully registered",
+          });
         } catch (error) {
           console.log(error);
-          return {
+          await transaction.rollback();
+          reject({
             success: false,
             message: "Something went wrong please try again later",
-          };
+          });
         }
       });
     }
