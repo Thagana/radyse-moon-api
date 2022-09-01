@@ -2,7 +2,7 @@
 import UserDOA from "../../infrastructure/db/entities/User";
 import NewsSettingsDOA from "../../infrastructure/db/entities/NewsSettings";
 import UserMetaDOA from "../../infrastructure/db/entities/UserMeta";
-import PushTokensDOA from '../../infrastructure/db/entities/PushTokens';
+import PushTokensDOA from "../../infrastructure/db/entities/PushTokens";
 import parser from "ua-parser-js";
 
 import { User } from "../../../domain/users/model";
@@ -70,17 +70,17 @@ export const userServiceRepository: IUsersRepositoryFactory = {
             user_id: user.id,
           });
           // SEND MAIL
-          const mailer = await Mailer.sendVerifyEmail(user.email, token); 
+          const mailer = await Mailer.sendVerifyEmail(user.email, token);
           if (!mailer) {
             reject({
               success: false,
               message: "Could not send mail",
             });
           } else {
-              resolve({
-                success: true,
-                message: "Successfully registered",
-              });
+            resolve({
+              success: true,
+              message: "Successfully registered",
+            });
           }
         } catch (error) {
           console.log(error);
@@ -128,26 +128,44 @@ export const userServiceRepository: IUsersRepositoryFactory = {
       });
     }
 
+    /**
+     * 
+     * @param token 
+     * @param user 
+     * @param title 
+     * @returns 
+     */
     async function updatePushToken(token: string, user: User, title: string) {
-      return new Promise<boolean>((resolve, reject) => {
-        PushTokensDOA.findOne({
-          where: {
-            user_id: user.id,
-          },
-        })
-          .then((values) => {
-            if (values) {
-              values.update({ token: token });
-            } else {
-              PushTokensDOA.create({
-                user_id: user.id,
+      return new Promise<boolean>(async (resolve, reject) => {
+        try {
+          console.log('title=>', title, 'token=>',token);
+          const oldToken = await PushTokensDOA.findOne({
+            where: {
+              user_id: user.id,
+            },
+          });
+          if (oldToken) {
+            await PushTokensDOA.update(
+              {
                 token: token,
-                title: title,
-              });
-            }
-            resolve(true);
-          })
-          .catch((error) => reject(error));
+              },
+              {
+                where: {
+                  user_id: user.id,
+                },
+              }
+            );
+          } else {
+            await PushTokensDOA.create({
+              user_id: user.id,
+              token: token,
+              title: title,
+            });
+          }
+          resolve(true);
+        } catch (error) {
+          reject(error);
+        }
       });
     }
 
@@ -160,7 +178,7 @@ export const userServiceRepository: IUsersRepositoryFactory = {
         push_enabled: number;
         email_notification: number;
         web_push_notification: number;
-        sms_notification: number
+        sms_notification: number;
       }>((resolve, reject) => {
         NewsSettingsDOA.findOne({
           where: {
@@ -189,7 +207,7 @@ export const userServiceRepository: IUsersRepositoryFactory = {
       findUser,
       createUser,
       getSettings,
-      updatePushToken
+      updatePushToken,
     };
   },
 };
