@@ -26,7 +26,7 @@ import { userServiceFactory } from "./domain/users/user.service";
 
 dotenv.config({ path: "../.env" });
 
-const db = new Database(process.env.DATABASE_URI || "");
+const db = new Database(process.env.DATABASE_URL || "");
 const mongodb = new Mongodb(process.env.MONGO_DB_URI || "");
 
 // INIT -> REPOSITORY
@@ -60,7 +60,7 @@ const app = appServerFactory.init({
 });
 
 let server = app.listen(process.env.PORT, () => {
-  logger.info(`Listening on *:${process.env.PORT}`);
+  logger.info(`Listening on http://localhost:${process.env.PORT}`);
 });
 
 const shutdown = signals.init(async () => {
@@ -71,7 +71,7 @@ const shutdown = signals.init(async () => {
 
 (async () => {
   try {
-    await db.authenticate();
+    // await db.authenticate();
     await mongodb.connect();
   } catch (error) {
     await shutdown();
