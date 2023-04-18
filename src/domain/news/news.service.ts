@@ -98,7 +98,7 @@ export const newsServiceFactory = {
       }
 
       const locations = ['za', 'us', 'gb'];
-      const categories = ['business', 'entertainment', 'general', 'health', 'science', 'sports', 'technology'];
+      const categories = ['general'];
       
       const urls = urlBuilder(locations, categories);
       const request = await requestUrl(urls)
@@ -109,6 +109,8 @@ export const newsServiceFactory = {
     async function requestUrl(urls: string[]) {
       try {
         const promises = []
+        console.log(urls);
+
         for (let i = 0; i < urls.length; i++) {
           const promise = axios.get(urls[i]);
           promises.push(promise);
@@ -142,6 +144,7 @@ export const newsServiceFactory = {
           data: ArtD
         }
       } catch (error) {
+        console.log(error);
         return {
           success: false,
           data: []
@@ -151,17 +154,17 @@ export const newsServiceFactory = {
 
     const urlBuilder = (locations: string[], categories: string[]) => {
       try {
-          let urls = [];
-          const placeholder = (l: string, c: string) => `https://newsapi.org/v2/top-headlines?country=${l}&category=${c}&apiKey=${configs.NEW_ENDPOINT}`;
+          let urls: string[] = [];
+          locations.forEach(l => {
+            categories.forEach(c => {
+              const link = `https://newsapi.org/v2/top-headlines?country=${l}&category=${c}&apiKey=${configs.NEW_ENDPOINT}`;
+              urls.push(link);
+            });
+          });
 
-          for (let i = 0; i < locations.length; i++) {
-            for (let j  = i + 1; j < categories.length; j++) {
-              urls.push(placeholder(locations[i], categories[j]))
-            }
-          }
           return urls
       } catch (error) {
-          logger.error(error);
+          console.error(error);
           return [''];
       }
   }

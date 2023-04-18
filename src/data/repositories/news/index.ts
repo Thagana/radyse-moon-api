@@ -77,9 +77,9 @@ export const newsServiceRepository: INewsRepositoryFactory = {
           const article = await ArticlesDOA.find({
             category: category,
             country: countryISO,
-            dateCreated: {
-              $gt: new Date(Date.now() - 24 * 60 * 60 * 1000),
-            },
+            // dateCreated: {
+            //   $gt: new Date(Date.now() - 24 * 60 * 60 * 1000),
+            // },
           })
             .sort({ dateCreated: -1 })
             .exec();

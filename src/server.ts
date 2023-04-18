@@ -23,9 +23,8 @@ import { newsServiceRepository } from "./data/repositories/news";
 // domain
 import { IUsersRepository } from "./domain/users/user.repository";
 
-dotenv.config({ path: "../.env" });
+dotenv.config();
 
-const db = new Database(process.env.DATABASE_URI || "");
 const mongodb = new Mongodb(process.env.MONGO_DB_URI || "");
 
 // INIT -> REPOSITORY
@@ -51,24 +50,8 @@ const app = appServerFactory.init({
   newsService,
 });
 
+mongodb.connect().then().catch(error => console.log('Error: ', error));
+
 let server = app.listen(process.env.PORT, () => {
   logger.info(`Listening on *:${process.env.PORT}`);
 });
-
-const shutdown = signals.init(async () => {
-  await db.close();
-  await mongodb.close()
-  server.close();
-});
-
-(async () => {
-  try {
-    await db.authenticate();
-    await mongodb.connect();
-  } catch (error) {
-    await shutdown();
-  }
-})();
-
-process.on("SIGINT", shutdown);
-process.on("SIGTERM", shutdown);
