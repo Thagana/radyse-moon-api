@@ -3,12 +3,12 @@ import axios from "axios";
 import { v4 } from "uuid";
 import urlBuilder from "../helpers/urlBuilder";
 import insertIntoDB from "../helpers/insertIntoDB";
-import NewsSettings from "../data/infrastructure/db/entities/Mongodb/NewsSettings";
+import NewsSettings from "../data/infrastructure/db/entities/NewsSettings";
 import cron from "node-cron";
-import PushTokens from "../data/infrastructure/db/entities/Mongodb/PushTokens";
+import PushTokens from "../data/infrastructure/db/entities/PushTokens";
 import sendPushNotification from "../helpers/sendPushNotification";
 import sentMailNotification from "../helpers/sendMailNotification";
-import UserModel from "../data/infrastructure/db/entities/Mongodb/Users";
+import UserModel from "../data/infrastructure/db/entities/User";
 import sendWebPushNotification from "../helpers/sendWebPushNotification";
 
 interface ArticleResponse {
@@ -36,15 +36,19 @@ interface DataFormat {
   dateCreated: string;
   country: string;
   category: string;
+  image: string;
+  location: string;
 }
 
 const saveNews = async (
-  userId: string
+  userId: number
 ): Promise<{ success: boolean; data?: DataFormat[] }> => {
   try {
     const settings = await NewsSettings.findOne({
-      user_id: userId,
-    }).exec();
+      where: {
+        user_id: userId,
+      }
+    });
 
     if (!settings) {
       return {
@@ -63,7 +67,7 @@ const saveNews = async (
     if (response.status === 200) {
       const data = response.data;
       const articles: ArticleResponse[] = data.articles;
-      const dateFormat: DataFormat[] = articles.map((item) => {
+      const dateFormat: DataFormat[] = articles.map((item, index) => {
         return {
           id: v4(),
           title: item.title || "Unknown",
@@ -78,6 +82,9 @@ const saveNews = async (
           dateCreated: new Date().toISOString(),
           country: location || "",
           category: category || "",
+          image: item.urlToImage ||
+          "https://avatars.githubusercontent.com/u/68122202?s=400&u=4abc9827a8ca8b9c19b06b9c5c7643c87da51e10&v=4",
+          location: location || "",
         };
       });
 
@@ -91,7 +98,7 @@ const saveNews = async (
       success: false,
     };
   } catch (error) {
-    logger.error((error as Error).stack);
+    logger.error(error);
     return {
       success: false,
     };
@@ -100,7 +107,7 @@ const saveNews = async (
 
 const saveNewsCron = cron.schedule("0 0 * * *", async () => {
   try {
-    const settings = await NewsSettings.find({});
+    const settings = await NewsSettings.findAll();
     for (let i = 0; i < settings.length; i++) {
       if (settings[i].push_enabled || settings[i].email_notification) {
         const saved = await saveNews(settings[i].user_id);
@@ -108,8 +115,10 @@ const saveNewsCron = cron.schedule("0 0 * * *", async () => {
         if (saved.success) {
           // Send Notification
           const token = await PushTokens.findOne({
-            user_id: settings[i].user_id,
-          }).exec();
+            where: {
+              user_id: settings[i].user_id,
+            }
+          })
 
           if (settings[i].push_enabled) {
             if (token) {
@@ -120,7 +129,9 @@ const saveNewsCron = cron.schedule("0 0 * * *", async () => {
             }
           }
           const user = await UserModel.findOne({
-            id: settings[i].user_id,
+            where: {
+              id: settings[i].user_id,
+            }
           });
 
           if (settings[i].email_notification) {

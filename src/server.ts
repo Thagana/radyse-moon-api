@@ -1,7 +1,6 @@
 import { INewsServiceFactory } from "./domain/news/news.service";
 import { INewsRepository } from "./domain/news/news.repository";
 import { Database } from "./data/infrastructure/db";
-import { Database as Mongodb } from './data/infrastructure/db/mongodb';
 import * as dotenv from "dotenv";
 import logger from "./utils/logger";
 import signals from "./signals";
@@ -25,8 +24,6 @@ import { IUsersRepository } from "./domain/users/user.repository";
 
 dotenv.config();
 
-const mongodb = new Mongodb(process.env.MONGO_DB_URI || "");
-
 // INIT -> REPOSITORY
 const authenticationRepository: IAuthenticationRepository =
   authServiceRepository.init();
@@ -49,8 +46,6 @@ const app = appServerFactory.init({
   authService,
   newsService,
 });
-
-mongodb.connect().then().catch(error => console.log('Error: ', error));
 
 let server = app.listen(process.env.PORT, () => {
   logger.info(`Listening on *:${process.env.PORT}`);

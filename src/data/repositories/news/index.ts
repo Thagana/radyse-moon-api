@@ -1,6 +1,5 @@
-import { News } from "../../../domain/news/news.model";
-import ArticlesDOA from "../../infrastructure/db/entities/Articles";
-import SettingsDOA from "../../infrastructure/db/entities/NewsSettings";
+import Articles from "../../infrastructure/db/entities/Articles";
+import Settings from "../../infrastructure/db/entities/NewsSettings";
 import { INewsRepository } from "../../../domain/news/news.repository";
 import Article from "../../../interface/articles-interface";
 
@@ -13,7 +12,7 @@ export const newsServiceRepository: INewsRepositoryFactory = {
     async function getSettings(userId: number) {
       return new Promise<{ category: string; location: string }>(
         (resolve, reject) => {
-          SettingsDOA.findOne({
+          Settings.findOne({
             where: {
               user_id: userId,
             },
@@ -43,14 +42,15 @@ export const newsServiceRepository: INewsRepositoryFactory = {
     ) {
       return new Promise<Article[]>(async (resolve, reject) => {
         try {
-          const article = await ArticlesDOA.find({
-            category: category,
-            country: countryISO,
+          const article = await Articles.findAll({
+            where: {
+              category: category,
+              country: countryISO,
+            },
+            limit: limit,
+            offset: offset,
+            order: [[ 'dateCreated', 'ASC' ]]
           })
-            .sort({ dateCreated: -1 })
-            .limit(limit)
-            .skip(offset)
-            .exec();
 
           const mapper = article.map((item) => ({
             id: item.id,
@@ -74,15 +74,13 @@ export const newsServiceRepository: INewsRepositoryFactory = {
     async function getHeadlines(category: string, countryISO: string) {
       return new Promise<Article[]>(async (resolve, reject) => {
         try {
-          const article = await ArticlesDOA.find({
-            category: category,
-            country: countryISO,
-            // dateCreated: {
-            //   $gt: new Date(Date.now() - 24 * 60 * 60 * 1000),
-            // },
+          const article = await Articles.findAll({
+            where: {
+              category: category,
+              country: countryISO,
+            },
+            order: [[ 'dateCreated', 'ASC' ]],
           })
-            .sort({ dateCreated: -1 })
-            .exec();
 
           const mapper = article.map((item) => ({
             id: item.id,

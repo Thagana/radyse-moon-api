@@ -12,13 +12,17 @@ interface Articles {
     dateCreated: string;
     country: string;
     category: string;
+    image: string;
+    description: string;
+    location: string;
 }
 
 const insertIntoDB = async (data: Articles[]): Promise<void> => {
     try {
-        await News.insertMany(data);
+        await News.bulkCreate(data);
     } catch (error) {
-        logger.error((error as Error).stack || error);
+        console.log(error);
+        logger.error(error);
     }
 };
 
