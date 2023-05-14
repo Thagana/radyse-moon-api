@@ -11,7 +11,7 @@ const config = {
   DB_USER_NAME: process.env.DB_USER_NAME || "",
   MONGO_DB_URI: process.env.MONGO_DB_URI || "",
   DATABASE_CONNECTION: process.env.DATABASE_URL || "",
-  DATABASE_URI: process.env.DATABASE_URL || ""
+  DATABASE_URI: process.env.DATABASE_URI || ""
 };
 
 export default config;

@@ -106,13 +106,12 @@ export const newsServiceRepository: INewsRepositoryFactory = {
     async function getHeadlineArticles() {
       return new Promise<Article[]>(async (resolve, reject) => {
         try {
-          const article = await ArticlesDOA.find({
-            dateCreated: {
-              $gt: moment(new Date(Date.now() - 24 * 60 * 60 * 1000)).toDate(),
+          const article = await ArticlesDOA.findAll({
+            where: {
+              publishedAt: moment(new Date(Date.now() - 24 * 60 * 60 * 1000)).toDate()
             },
+            order: [[ 'dateCreated', 'ASC' ]],
           })
-            .sort({ dateCreated: -1 })
-            .exec();
           const mapper = article.map((item) => ({
             id: item.id,
             title: item.title,

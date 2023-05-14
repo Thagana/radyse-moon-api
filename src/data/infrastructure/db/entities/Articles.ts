@@ -102,6 +102,4 @@ Article.init(
   }
 );
 
-// Article.sync().then(() => console.log('success')).catch(error => console.log(error))
-
 export default Article;
