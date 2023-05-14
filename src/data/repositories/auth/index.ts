@@ -33,7 +33,8 @@ export const authServiceRepository: IAuthRepositoryFactory = {
           .catch((error) => reject(error));
       });
     }
-    async function sendMail(username: string, email: string, token: string) {
+    
+    async function sendMail(email: string, token: string) {
       return new Promise<boolean>((resolve, reject) => {
         Mailer.sendVerifyEmail(email, token).then(results => {
           if (results) {
@@ -55,7 +56,7 @@ export const authServiceRepository: IAuthRepositoryFactory = {
     return {
       getJwtToken,
       getValidateCode,
-      sendMail
+      sendMail,
     };
   },
 };

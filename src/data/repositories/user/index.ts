@@ -4,7 +4,7 @@ import NewsSettingsDOA from "../../infrastructure/db/entities/NewsSettings";
 import UserMetaDOA from "../../infrastructure/db/entities/UserMeta";
 import PushTokensDOA from "../../infrastructure/db/entities/PushTokens";
 import parser from "ua-parser-js";
-
+import { Database } from "../../infrastructure/db/index";
 import { User } from "../../../domain/users/model";
 
 import { IUsersRepository } from "../../../domain/users/user.repository";
@@ -23,6 +23,8 @@ export const userServiceRepository: IUsersRepositoryFactory = {
       token: string,
       headers: IncomingHttpHeaders
     ) {
+      const db = new Database(process.env.DATABASE_URI || "");
+      const transaction = await db.sequelize.transaction();
       return new Promise<RegisterResponse>(async (resolve, reject) => {
         try {
           // CREATE USER
@@ -84,10 +86,11 @@ export const userServiceRepository: IUsersRepositoryFactory = {
           }
         } catch (error) {
           console.log(error);
-          return {
+          await transaction.rollback();
+          reject({
             success: false,
             message: "Something went wrong please try again later",
-          };
+          });
         }
       });
     }

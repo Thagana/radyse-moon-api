@@ -1,7 +1,6 @@
 import { INewsServiceFactory } from "./domain/news/news.service";
 import { INewsRepository } from "./domain/news/news.repository";
 import { Database } from "./data/infrastructure/db";
-import { Database as Mongodb } from './data/infrastructure/db/mongodb';
 import * as dotenv from "dotenv";
 import logger from "./utils/logger";
 import signals from "./signals";
@@ -24,10 +23,7 @@ import { newsServiceRepository } from "./data/repositories/news";
 import { IUsersRepository } from "./domain/users/user.repository";
 import { userServiceFactory } from "./domain/users/user.service";
 
-dotenv.config({ path: "../.env" });
-
-const db = new Database(process.env.DATABASE_URL || "");
-const mongodb = new Mongodb(process.env.MONGO_DB_URI || "");
+dotenv.config();
 
 // INIT -> REPOSITORY
 const authenticationRepository: IAuthenticationRepository =
@@ -62,21 +58,3 @@ const app = appServerFactory.init({
 let server = app.listen(process.env.PORT, () => {
   logger.info(`Listening on http://localhost:${process.env.PORT}`);
 });
-
-const shutdown = signals.init(async () => {
-  await db.close();
-  await mongodb.close()
-  server.close();
-});
-
-(async () => {
-  try {
-    // await db.authenticate();
-    await mongodb.connect();
-  } catch (error) {
-    await shutdown();
-  }
-})();
-
-process.on("SIGINT", shutdown);
-process.on("SIGTERM", shutdown);
