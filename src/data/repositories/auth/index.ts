@@ -1,7 +1,6 @@
 import jwt from "jsonwebtoken";
 import { configs } from "../../../configs/app.configs";
-import { User } from "../../../domain/users/model";
-import UserDOA from "../../infrastructure/db/entities/User";
+import User from "../../infrastructure/db/entities/User";
 
 import { IAuthenticationRepository } from "../../../domain/auth/auth.repository";
 import { Mailer } from "../../../helpers/Mailer/Mailer";
@@ -17,9 +16,17 @@ export const authServiceRepository: IAuthRepositoryFactory = {
       return jwtToken;
     }
 
+    /**
+     * Returns a User object if the given code matches a user's token,
+     * otherwise returns false.
+     *
+     * @param {string} code - The code to validate against a user's token.
+     * @return {Promise<User | boolean>} - A Promise that resolves with a User
+     * object if the code is valid, or false otherwise.
+     */
     async function getValidateCode(code: string): Promise<User | boolean> {
       return new Promise<User | boolean>((resolve, reject) => {
-        UserDOA.findOne({
+        User.findOne({
           where: {
             token: code,
           },
@@ -27,31 +34,36 @@ export const authServiceRepository: IAuthRepositoryFactory = {
           .then((user) => {
             if (user) {
               resolve(user);
+            } else {
+              resolve(false);
             }
-            resolve(false);
           })
           .catch((error) => reject(error));
       });
     }
-    
-    async function sendMail(email: string, token: string) {
+
+    async function sendMail(username: string, email: string, token: string) {
       return new Promise<boolean>((resolve, reject) => {
-        Mailer.sendVerifyEmail(email, token).then(results => {
-          if (results) {
-            resolve(true);
-          } else {
-            resolve(false);
-          }
-        }).catch(error => reject(error))
-      })
+        Mailer.sendVerifyEmail(email, token)
+          .then((results) => {
+            if (results) {
+              resolve(true);
+            } else {
+              resolve(false);
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+            reject(error);
+          });
+      });
     }
 
     async function createUser(email: string) {
       return new Promise((resolve, reject) => {
         //
-      })
+      });
     }
-
 
     return {
       getJwtToken,
