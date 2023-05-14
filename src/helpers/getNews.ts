@@ -33,14 +33,15 @@ const getNews = async (
 
     const { limit, offset } = getPagination(page, size);
 
-    const news = await ArticleModel.find({
-      category: category,
-      country: countryISO,
-    })
-      .sort({ dateCreated: -1 })
-      .limit(limit)
-      .skip(offset)
-      .exec();
+    const news = await ArticleModel.findAll({
+      where: {
+        category: category,
+        country: countryISO,
+      },
+      order: [[ 'dateCreated', 'DESC' ]],
+      limit,
+      offset
+    });
 
     const mapper: DataFormat[] = news.map((item) => ({
       id: item.id,
