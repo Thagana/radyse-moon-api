@@ -4,7 +4,7 @@ import config from '../../../../configs/db.configs';
 
 interface PushTokenAttributes {
     id: string;
-    user_id: string;
+    user_id: number;
     title: string;
     token: string;
 }
@@ -13,7 +13,7 @@ type PushTokenCreationAttributes = Optional<PushTokenAttributes, 'id'>;
 
 class PushToken extends Model<PushTokenAttributes, PushTokenCreationAttributes> implements PushTokenAttributes {
     public id!: string;
-    public user_id!: string;
+    public user_id!: number;
     public title!: string;
     public token!: string;
 }

@@ -8,7 +8,9 @@ export const loginHandler = async (
 ): Promise<Response> => {
   try {
     const { code } = request.body;
-    const loginResponse = await service.authService.login(code);
+    const fcmtoken = request.headers['fcm_token'] as string;
+    const title = request.headers['token_title'] as string;
+    const loginResponse = await service.authService.login(code, fcmtoken, title);
     if (!loginResponse.success) {
       return response.status(400).json(loginResponse);
     }

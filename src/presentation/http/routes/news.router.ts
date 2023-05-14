@@ -1,5 +1,6 @@
 import express, {  Request, Response} from 'express';
 import { fetchNewsHandle, headlineHandler } from '../route-handler/news.handler';
+import { allNewsHandler, headlineHandler } from '../route-handler/news.handler';
 import { IServices } from './../../../interface/IService';
 
 const router = express.Router({ mergeParams: true });
@@ -10,6 +11,7 @@ export class NewsRoutes {
         headlineHandler(service, request, response)
       );
       router.post("/fetch-news", (request: Request, response: Response) => fetchNewsHandle(service, request, response))
+      router.get('/all-news', (request: Request, response: Response) => allNewsHandler(service, request, response))
       return router;
     }
 }

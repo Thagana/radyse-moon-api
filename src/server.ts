@@ -21,6 +21,7 @@ import { newsServiceRepository } from "./data/repositories/news";
 
 // domain
 import { IUsersRepository } from "./domain/users/user.repository";
+import { userServiceFactory } from "./domain/users/user.service";
 
 dotenv.config();
 
@@ -42,11 +43,18 @@ const newsService = newsServiceFactory.init({
   userRepository,
 });
 
+const userService = userServiceFactory.init({
+  newsRepository,
+  authenticationRepository,
+  userRepository,
+})
+
 const app = appServerFactory.init({
   authService,
   newsService,
+  userService
 });
 
 let server = app.listen(process.env.PORT, () => {
-  logger.info(`Listening on *:${process.env.PORT}`);
+  logger.info(`Listening on http://localhost:${process.env.PORT}`);
 });

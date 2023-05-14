@@ -1,8 +1,8 @@
-import { Router } from "express";
-import bookmarks from '../controllers/news/bookmarks';
+// import { Router } from "express";
+// import bookmarks from '../controllers/news/bookmarks';
 
-const router = Router();
+// const router = Router();
 
-router.post('/create', bookmarks);
+// router.post('/create', bookmarks);
 
-export default router;
+// export default router;

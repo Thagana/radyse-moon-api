@@ -3,7 +3,12 @@ import Logger from "../../utils/logger";
 import { configs } from "../../configs/app.configs";
 
 export class Mailer {
-  public static async sendVerifyEmail(email: string, token: string) {
+  constructor(
+    public readonly username: string,
+    public readonly email: string,
+    public readonly token: string
+  ) {}
+  public static async sendVerifyEmail(email: string , token: string) {
     return new Promise<boolean>((resolve, reject) => {
       const transporter = nodemailer.createTransport({
         host: "smtp.mail.yahoo.com",

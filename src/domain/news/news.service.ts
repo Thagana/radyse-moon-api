@@ -16,6 +16,22 @@ export interface INewsService {
   }>;
   allNews(id: number, page: string, size: string): Promise<Article[]>;
   fetchArticles(KEY: string): Promise<{success: boolean, data: any[]}>;
+  headlines(id: number, page: string, size: string): Promise<Article[]>;
+  allNews(
+    id: number,
+    page: string,
+    size: string
+  ): Promise<
+    | {
+        success: boolean;
+        data: Article[];
+        message?: undefined;
+      }
+    | {
+        success: boolean;
+        error: unknown;
+      }
+  >;
 }
 
 export interface INewsServiceFactory {
@@ -24,13 +40,15 @@ export interface INewsServiceFactory {
 
 export const newsServiceFactory = {
   init(repositories: IRepositories): INewsService {
-    async function headlines(id: number) {
-      return new Promise<{
-        success: boolean;
-        message: string;
-        data: Article[];
-      }>((resolve, reject) => {
-        fetchHeadlines(id)
+    async function headlines(id: number, page: string, size: string) {
+      return new Promise<Article[]>((resolve, reject) => {
+        let pageQuery = page as unknown as number;
+        let sizeQuery = size as unknown as number;
+        if (!pageQuery || !sizeQuery) {
+          pageQuery = 1;
+          sizeQuery = 10;
+        }
+        repositories.newsRepository.getHeadlineArticles()
           .then((response) => {
             resolve({
               success: true,
@@ -41,18 +59,7 @@ export const newsServiceFactory = {
           .catch((error) => reject(error));
       });
     }
-
-    async function fetchHeadlines(id: number) {
-      const settings = await repositories.newsRepository.getSettings(id);
-      const category = settings.category;
-      const location = settings.location;
-      const articles = await repositories.newsRepository.getHeadlines(
-        category,
-        location
-      );
-      return articles; 
-    }
-
+    
     async function fetchNews(
       id: number,
       page: number,
@@ -79,14 +86,24 @@ export const newsServiceFactory = {
     }
 
     async function allNews(id: number, page: string, size: string) {
-      let pageQuery = page as unknown as number;
-      let sizeQuery = size as unknown as number;
-      if (!pageQuery || !sizeQuery) {
-        pageQuery = 1;
-        sizeQuery = 10;
+      try {
+        let pageQuery = page as unknown as number;
+        let sizeQuery = size as unknown as number;
+        if (!pageQuery || !sizeQuery) {
+          pageQuery = 1;
+          sizeQuery = 10;
+        }
+        const news = await fetchNews(id, pageQuery, sizeQuery);
+        return {
+          success: true,
+          data: news,
+        };
+      } catch (error) {
+        return {
+          success: false,
+          error,
+        };
       }
-      const news = await fetchNews(id, pageQuery, sizeQuery);
-      return news;
     }
 
     async function fetchArticles(KEY: string) {

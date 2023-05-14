@@ -36,9 +36,22 @@ export const authServiceRepository: IAuthRepositoryFactory = {
     
     async function sendMail(email: string, token: string) {
       return new Promise<boolean>((resolve, reject) => {
-        Mailer.sendVerifyEmail(email, token).then(() => {resolve(true)}).catch((error: any) => reject(error));
-      });
+        Mailer.sendVerifyEmail(email, token).then(results => {
+          if (results) {
+            resolve(true);
+          } else {
+            resolve(false);
+          }
+        }).catch(error => reject(error))
+      })
     }
+
+    async function createUser(email: string) {
+      return new Promise((resolve, reject) => {
+        //
+      })
+    }
+
 
     return {
       getJwtToken,
