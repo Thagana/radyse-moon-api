@@ -107,9 +107,6 @@ export const newsServiceRepository: INewsRepositoryFactory = {
       return new Promise<Article[]>(async (resolve, reject) => {
         try {
           const article = await ArticlesDOA.findAll({
-            where: {
-              publishedAt: moment(new Date(Date.now() - 24 * 60 * 60 * 1000)).toDate()
-            },
             order: [[ 'dateCreated', 'ASC' ]],
           })
           const mapper = article.map((item) => ({

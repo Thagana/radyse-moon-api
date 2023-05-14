@@ -12,8 +12,8 @@ export const headlineHandler = async (
     const page = request.query.page as string;
     const size = request.query.size as string;
     const news = await service.newsService.headlines(id, page, size);
-    return response.status(200).json(news);
-  } catch (error) {
+    return response.status(200).json({ success: true, data: news });
+  } catch (error) { 
     console.log(error);
     return response.status(400).json({
       success: false,

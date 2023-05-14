@@ -64,7 +64,7 @@ export const newsServiceFactory = {
      * @param {string} size - The size of the article.
      * @return {Promise<Article[]>} A promise that resolves to an array of Article objects.
      */
-    async function headlines(id: number, page: string, size: string) {
+    async function headlines(id: number, page: string, size: string): Promise<Article[]> {
       return new Promise<Article[]>((resolve, reject) => {
         let pageQuery = page as unknown as number;
         let sizeQuery = size as unknown as number;
