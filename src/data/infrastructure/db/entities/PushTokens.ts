@@ -41,5 +41,6 @@ PushToken.init({
     tableName: "push_tokens",
     sequelize: new Database(config.DATABASE_URI).sequelize!,
     timestamps: false,
-});
-export default PushToken;
+})
+
+export default PushToken

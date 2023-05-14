@@ -26,9 +26,8 @@ Sentry.init({
     new Tracing.Integrations.Express({ app }),
   ],
 
-  // Set tracesSampleRate to 1.0 to capture 100%
-  // of transactions for performance monitoring.
-  // We recommend adjusting this value in production
+
+
   tracesSampleRate: 1.0,
 });
 
@@ -49,7 +48,7 @@ export const appServerFactory = {
       algorithms: ['HS256'],
     })
       .unless({
-        path: ['/auth/register', '/auth/login'],
+        path: ['/auth/register', '/auth/login', '/news/fetch-news'],
       }));
     app.use('/auth', AuthRouter.init(services));
     app.use('/news', NewsRoutes.init(services));
