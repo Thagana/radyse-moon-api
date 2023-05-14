@@ -1,3 +1,3 @@
-# Ultimate News API
+# Radyse Moon API
 
-The backend for the news API
+Radyse Moon API
