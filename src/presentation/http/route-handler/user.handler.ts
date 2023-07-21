@@ -7,7 +7,7 @@ export const settingsHandler = async (
 ) => {
   try {
     // @ts-ignore
-    const id = request?.auth?.id as number;
+    const id = request?.auth?.id as string;
     const settings = await service.userService.getSettings(id);
     return response.status(200).json({
       success: true,
