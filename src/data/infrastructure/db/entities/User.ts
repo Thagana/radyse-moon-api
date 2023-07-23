@@ -9,9 +9,11 @@ interface UserAttributes {
   email: string;
   avatar: string;
   token: string;
+  password: string;
+  verified: number;
 }
 
-type UserCreationAttributes = Optional<UserAttributes, "id">;
+type UserCreationAttributes = Optional<UserAttributes, "id" | "verified">;
 
 class User
   extends Model<UserAttributes, UserCreationAttributes>
@@ -22,6 +24,8 @@ class User
   public last_name!: string;
   public email!: string;
   public avatar!: string;
+  public password!: string;
+  public verified!: number;
   public token!: string;
 }
 
@@ -49,6 +53,15 @@ User.init(
       type: DataTypes.STRING,
       allowNull: false,
       defaultValue: "https://avatars.githubusercontent.com/u/68122202?s=400&u=4abc9827a8ca8b9c19b06b9c5c7643c87da51e10&v=4",
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    verified: {
+      type: DataTypes.NUMBER,
+      allowNull: false,
+      defaultValue: 0,
     },
     token: {
       type: DataTypes.STRING,

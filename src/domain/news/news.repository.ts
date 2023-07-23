@@ -1,7 +1,7 @@
 import Article from "../../interface/articles-interface";
 
 export interface INewsRepository {
-  getSettings(id: number): Promise<{
+  getSettings(id: string): Promise<{
     location: string;
     category: string;
   }>;

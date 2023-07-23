@@ -8,7 +8,7 @@ export const headlineHandler = async (
 ) => {
   try {
     // @ts-ignore 
-    const id = request?.auth?.id as number;
+    const id = request?.user?.user_id as string;
     const page = request.query.page as string;
     const size = request.query.size as string;
     const news = await service.newsService.headlines(id, page, size);
@@ -26,7 +26,7 @@ export const headlineHandler = async (
 export const allNewsHandler = async (service: IServices, request: Request, response: Response) => {
   try {
       // @ts-ignore 
-      const id = request?.auth?.id as number;
+      const id = request?.user?.user_id as string;
       const {  page, size } = request.query as unknown as {  page: string, size: string};
       const news = await service.newsService.allNews(id, page, size);
       return response.status(200).json(news);
