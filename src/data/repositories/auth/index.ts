@@ -61,9 +61,9 @@ export const authServiceRepository: IAuthRepositoryFactory = {
     }
 
     function generateLink(alpha: string) {
-      let link = '';
+      let link = "";
       for (let i = 0; i < 4; i++) {
-        link += alpha[Math.random() * alpha.length | 0];
+        link += alpha[(Math.random() * alpha.length) | 0];
       }
       return link;
     }
@@ -75,30 +75,26 @@ export const authServiceRepository: IAuthRepositoryFactory = {
 
     async function verifyAccount(token: string) {
       try {
-        const user = await User.findOne({
-          where: {
-            token: token,
-          },
-        });
-        if (!user) {
-          return false;
-        }
         await User.update(
           {
             verified: 1,
           },
           {
             where: {
-              id: user.id,
+              token: token,
             },
-          },
+          }
         );
         return true;
       } catch (error) {
+        console.error(error);
         return false;
       }
     }
-    function checkHashedPassword(password: string, userPassword: string): boolean {
+    function checkHashedPassword(
+      password: string,
+      userPassword: string
+    ): boolean {
       return bcrypt.compareSync(password, userPassword);
     }
     async function updateFCMToken(id: number, fcmtoken: string) {
@@ -117,11 +113,11 @@ export const authServiceRepository: IAuthRepositoryFactory = {
               where: {
                 user_id: id,
               },
-            },
+            }
           );
         } else {
           await PushToken.create({
-            title: 'tagging',
+            title: "tagging",
             user_id: id,
             token: fcmtoken,
           });
@@ -129,7 +125,7 @@ export const authServiceRepository: IAuthRepositoryFactory = {
       }
     }
     function createToken(id: number) {
-      const token = jwt.sign({ id: id }, configs.TOKEN_SECRET || '');
+      const token = jwt.sign({ id: id }, configs.TOKEN_SECRET || "");
       return token;
     }
     return {

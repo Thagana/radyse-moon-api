@@ -31,14 +31,20 @@ export const registerHandler = async (
   try {
     const { email, password, firstName, lastName } = request.body;
     const { headers } = request;
-    const registerResponse = await service.authService.register(firstName, lastName, email, password, headers);
-    if (!registerResponse.success) {
+    const { success, token, message } = await service.authService.register(firstName, lastName, email, password, headers);
+    if (!success) {
       return response.status(400).json({
         success: false,
-        message: registerResponse.message,
+        message: message,
       });
     }
-    return response.status(200).json(registerResponse);
+    
+    await service.notificationService.sendVerificationNotification(firstName, lastName, email, token);
+    
+    return response.status(200).json({
+      success: true,
+      message,
+    });
   } catch (error) {
     console.log(error);
     return response.status(400).json({

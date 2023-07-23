@@ -52,30 +52,7 @@ export const userServiceRepository: IUsersRepositoryFactory = {
             email_notification: 0,
             web_push_notification: 0,
           });
-          // CREATE USER META
-          const UA = parser(headers["user-agent"]);
-          const browserName = UA.browser.name || "X_AVAIL";
-          const browserVersion = UA.browser.version || "X_AVAIL";
-          const deviceModel = UA.device.model || "X_AVAIL";
-          const deviceVendor = UA.device.vendor || "X_AVAIL";
-          const deviceType = UA.device.type || "X_AVAIL";
-          const osName = UA.os.name || "X_AVAIL";
-          const osVersion = UA.os.version || "X_AVAIL";
-          const cpuArch = UA.cpu.architecture || "X_AVAIL";
-          const engine = UA.engine.name || "X_AVAIL";
 
-          await UserMetaDOA.create({
-            browser_name: browserName,
-            browser_version: browserVersion,
-            device_model: deviceModel,
-            device_vendor: deviceVendor,
-            device_type: deviceType,
-            os_name: osName,
-            os_version: osVersion,
-            cpu_architecture: cpuArch,
-            engine_name: engine,
-            user_id: user.id,
-          });
           // SEND MAIL
           const mailer = await Mailer.sendVerifyEmail(user.email, emailCode);
           if (!mailer) {

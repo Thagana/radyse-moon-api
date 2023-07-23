@@ -83,6 +83,7 @@ export const authServiceFactory: IAuthServiceFactory = {
         return {
           success: true,
           message: "successfully registered",
+          token: emailCode
         };
       } catch (error) {
         console.log({ error });
