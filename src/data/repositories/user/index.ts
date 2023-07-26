@@ -1,14 +1,12 @@
 // DOA
-import UserDOA from "../../infrastructure/db/entities/User";
+import User from "../../infrastructure/db/entities/User";
 import NewsSettingsDOA from "../../infrastructure/db/entities/NewsSettings";
 import UserMetaDOA from "../../infrastructure/db/entities/UserMeta";
 import PushTokensDOA from "../../infrastructure/db/entities/PushTokens";
 import parser from "ua-parser-js";
 import { Database } from "../../infrastructure/db/index";
-import { User } from "../../../domain/users/model";
 
 import { IUsersRepository } from "../../../domain/users/user.repository";
-import { RegisterResponse } from "../../../interface/IResponse";
 import { Mailer } from "../../../helpers/Mailer/Mailer";
 import { IncomingHttpHeaders } from "http";
 
@@ -19,22 +17,29 @@ interface IUsersRepositoryFactory {
 export const userServiceRepository: IUsersRepositoryFactory = {
   init(): IUsersRepository {
     async function createUser(
+      firstName: string,
+      lastName: string,
       email: string,
-      token: string,
+      hashPassword: string,
+      emailCode: string,
       headers: IncomingHttpHeaders
-    ) {
+    ): Promise<{ success: boolean; message: string }> {
       const db = new Database(process.env.DATABASE_URI || "");
       const transaction = await db.sequelize.transaction();
-      return new Promise<RegisterResponse>(async (resolve, reject) => {
+      return new Promise<{
+        success: boolean;
+        message: string;
+      }>(async (resolve, reject) => {
         try {
           // CREATE USER
-          const user = await UserDOA.create({
-            first_name: "first_name",
-            last_name: "last_name",
-            email,
+          const user = await User.create({
+            email: email,
+            token: emailCode,
+            first_name: firstName,
+            last_name: lastName,
+            password: hashPassword,
             avatar:
               "https://avatars.githubusercontent.com/u/68122202?s=400&u=4abc9827a8ca8b9c19b06b9c5c7643c87da51e10&v=4",
-            token: token,
           });
           // CREATE NEWS SETTINGS
           await NewsSettingsDOA.create({
@@ -47,32 +52,9 @@ export const userServiceRepository: IUsersRepositoryFactory = {
             email_notification: 0,
             web_push_notification: 0,
           });
-          // CREATE USER META
-          const UA = parser(headers["user-agent"]);
-          const browserName = UA.browser.name || "X_AVAIL";
-          const browserVersion = UA.browser.version || "X_AVAIL";
-          const deviceModel = UA.device.model || "X_AVAIL";
-          const deviceVendor = UA.device.vendor || "X_AVAIL";
-          const deviceType = UA.device.type || "X_AVAIL";
-          const osName = UA.os.name || "X_AVAIL";
-          const osVersion = UA.os.version || "X_AVAIL";
-          const cpuArch = UA.cpu.architecture || "X_AVAIL";
-          const engine = UA.engine.name || "X_AVAIL";
 
-          await UserMetaDOA.create({
-            browser_name: browserName,
-            browser_version: browserVersion,
-            device_model: deviceModel,
-            device_vendor: deviceVendor,
-            device_type: deviceType,
-            os_name: osName,
-            os_version: osVersion,
-            cpu_architecture: cpuArch,
-            engine_name: engine,
-            user_id: user.id,
-          });
           // SEND MAIL
-          const mailer = await Mailer.sendVerifyEmail(user.email, token);
+          const mailer = await Mailer.sendVerifyEmail(user.email, emailCode);
           if (!mailer) {
             reject({
               success: false,
@@ -95,8 +77,8 @@ export const userServiceRepository: IUsersRepositoryFactory = {
       });
     }
     async function findUser(email: string) {
-      return new Promise<User | false>((resolve, reject) => {
-        UserDOA.findOne({
+      return new Promise<User | boolean>((resolve, reject) => {
+        User.findOne({
           where: {
             email,
           },
@@ -132,16 +114,15 @@ export const userServiceRepository: IUsersRepositoryFactory = {
     }
 
     /**
-     * 
-     * @param token 
-     * @param user 
-     * @param title 
-     * @returns 
+     *
+     * @param token
+     * @param user
+     * @param title
+     * @returns
      */
     async function updatePushToken(token: string, user: User, title: string) {
       return new Promise<boolean>(async (resolve, reject) => {
         try {
-          console.log('title=>', title, 'token=>',token);
           const oldToken = await PushTokensDOA.findOne({
             where: {
               user_id: user.id,
@@ -172,7 +153,7 @@ export const userServiceRepository: IUsersRepositoryFactory = {
       });
     }
 
-    async function getSettings(id: number) {
+    async function getSettings(id: string) {
       return new Promise<{
         language: string;
         location: string;

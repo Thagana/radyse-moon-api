@@ -22,4 +22,10 @@ export interface IAuthenticationRepository {
    * @return {Promise<boolean>} A promise that resolves to true if the email was successfully sent.
    */
   sendMail(username: string, email: string, password: string): Promise<boolean>;
+  generateLink(email: string): string;
+  hashPassword(salt: number, password: string): Promise<string>
+  verifyAccount(token: string): Promise<boolean>
+  checkHashedPassword(password: string, hashedPassword: string): boolean
+  updateFCMToken(userId: number, token: string | undefined): Promise<void>
+  createToken(userId: number): string
 }

@@ -1,17 +1,22 @@
 import { User } from "./model";
-import { RegisterResponse } from "../../interface/IResponse";
 import { IncomingHttpHeaders } from "http";
 
 export interface IUsersRepository {
   createUser(
+    firstName: string,
+    lastName: string,
     email: string,
-    token: string,
+    hashPassword: string,
+    emailCode: string,
     headers: IncomingHttpHeaders
-  ): Promise<RegisterResponse>;
-  findUser(email: string): Promise<User | false>;
+  ): Promise<{
+    success: boolean;
+    message: string;
+  }>;
+  findUser(email: string): Promise<User | boolean>;
   updateToken(token: string, user: User): Promise<boolean>;
   updatePushToken(token: string, user: User, title: string): Promise<boolean>;
-  getSettings(id: number): Promise<{
+  getSettings(id: string): Promise<{
     language: string;
     location: string;
     category: string;

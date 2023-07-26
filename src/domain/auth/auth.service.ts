@@ -5,96 +5,88 @@ import { IncomingHttpHeaders } from "http";
 
 // SERVICE INTERFACE
 export interface IAuthService {
-  /**
-   * Registers a user with the provided email and headers.
-   *
-   * @param {string} email - The email of the user to be registered.
-   * @param {IncomingHttpHeaders} headers - The headers of the incoming HTTP request.
-   * @return {Promise<RegisterResponse>} - A promise that resolves to a RegisterResponse object.
-   */
   register(
+    firstName: string,
+    lastName: string,
     email: string,
+    password: string,
     headers: IncomingHttpHeaders
   ): Promise<RegisterResponse>;
-  /**
-   * Logs the user in with the provided authentication code.
-   *
-   * @param {string} code - The authentication code.
-   * @param {string} [fcmtoken] - The Firebase Cloud Messaging token.
-   * @param {string} [title] - The title of the login request.
-   * @return {Promise<LoginResponse>} The login response.
-   */
   login(
-    code: string,
+    email: string,
+    password: string,
     fcmtoken?: string,
-    title?: string
-  ): Promise<LoginResponse>;
+  ): Promise<{
+    success: boolean,
+    message: string,
+    data?: {
+      profile: {
+        firstName: string,
+        lastName: string,
+        fullName: string,
+        email: string,
+        avatar: string,
+      },
+    }
+  }>;
+  verify(token: string): Promise<{
+    success: boolean;
+    message: string;
+  }>;
 }
 
-// SERVICE FACTORY -> CREATING NEW SERVICE USING THE SERVICE FACTORY PATTERN
 interface IAuthServiceFactory {
   init(repositories: IRepositories): IAuthService;
 }
 
 export const authServiceFactory: IAuthServiceFactory = {
   init(repositories: IRepositories) {
-    /**
-     * Asynchronously registers a user by creating a new user account if the provided email is not already registered.
-     * If user exists, sends a verification code to the email address associated with the user, updates the user's token and returns a successful response.
-     * Otherwise, creates a new user account with the given details and returns the result of the operation.
-     *
-     * @async
-     * @function register
-     * @param {string} email - The email of the user to register
-     * @param {IncomingHttpHeaders} headers - The headers object containing metadata associated with the request
-     * @return {Promise<RegisterResponse>} - A promise that resolves to a RegisterResponse object indicating the success or failure of the operation
-     */
     async function register(
+      firstName: string,
+      lastName: string,
       email: string,
+      password: string,
       headers: IncomingHttpHeaders
     ): Promise<RegisterResponse> {
       try {
+        const ALPHABET = "0123456789";
+
+        const emailCode =
+          repositories.authenticationRepository.generateLink(ALPHABET);
+
         const user = await repositories.userRepository.findUser(email);
 
-        const rand = (min: number, max: number) => {
-          return Math.floor(Math.random() * (max - min + 1) + min);
-        };
-
-        const token = tokenGenerator(rand);
-
         if (user) {
-          const sent = await sendVerificationCode(user, token);
-          if (!sent.success) {
-            return {
-              success: false,
-              message: "Could not sent mail",
-            };
-          }
+          return { success: false, message: "Account already exist" };
+        }
 
-          const updateToken = await repositories.userRepository.updateToken(
-            token,
-            user
+        const hashPassword =
+          await repositories.authenticationRepository.hashPassword(
+            10,
+            password
           );
 
-          if (!updateToken) {
-            return {
-              success: false,
-              message: "Failed to update token",
-            };
-          }
-          return {
-            success: true,
-            message: "Please check email, a verification code has been sent",
-          };
-        }
         const createUser = await repositories.userRepository.createUser(
+          firstName,
+          lastName,
           email,
-          token,
+          hashPassword,
+          emailCode,
           headers
         );
-        return createUser;
+        if (!createUser) {
+          return {
+            success: false,
+            message: "Something went wrong please try again later",
+          };
+        }
+        return {
+          success: true,
+          message: "successfully registered",
+          token: emailCode
+        };
       } catch (error) {
-        console.log(error);
+        console.log({ error });
         return {
           success: false,
           message: "Something went wrong, please try again later",
@@ -102,73 +94,73 @@ export const authServiceFactory: IAuthServiceFactory = {
       }
     }
 
-    function tokenGenerator(rand: (min: number, max: number) => number) {
-      let val = "";
-      for (let i = 0; i < 5; i += 1) {
-        val += `${rand(0, 10)}`;
-      }
-      return val;
-    }
+    async function login(
+      email: string,
+      password: string,
+      fcmtoken?: string,
+    ) {
+      try {
+        // if email is provided fail
+        if (!email) {
+          return { success: false, message: "Email is required" };
+        }
+        // if password is provided fail
+        if (!password) {
+          return { success: false, message: "Password is required" };
+        }
+        // if both email and password are provided fail
+        if (!email || !password) {
+          return { success: false, message: "Email and password are required" };
+        }
+        // Email and password should be a string
+        if (typeof email !== "string") {
+          return { success: false, message: "Email should be a string" };
+        }
+        if (typeof password !== "string") {
+          return { success: false, message: "Password should be a string" };
+        }
+        const user = await repositories.userRepository.findUser(email);
 
-    async function sendVerificationCode(user: User, token: string) {
-      const mailer = await repositories.authenticationRepository.sendMail(
-        "NOT_UPDATED_USER",
-        user.email,
-        token
-      );
-      if (!mailer) {
+        if (typeof user === "boolean") {
+          return { success: false, message: "Could not find user" };
+        }
+        const is_verified = user.verified;
+        if (!is_verified) {
+          return { success: false, message: "Not yet activated your account" };
+        }
+        const checkHashedPassword =
+          repositories.authenticationRepository.checkHashedPassword(
+            password,
+            user.password
+          );
+        if (!checkHashedPassword) {
+          return { success: false, message: "Username or password incorrect!" };
+        }
+        const token = repositories.authenticationRepository.createToken(user.id);
+
+
+        await repositories.authenticationRepository.updateFCMToken(user.id, fcmtoken);
+        return {
+          success: true,
+          message: "Successfully loggedIn",
+          data: {
+            token,
+            profile: {
+              firstName: user.first_name,
+              lastName: user.last_name,
+              fullName: `${user.first_name} ${user.last_name}`,
+              email: user.email,
+              avatar: user.avatar,
+            },
+          },
+        };
+      } catch (error) {
+        console.log(error);
         return {
           success: false,
-          message: "Failed to send mail",
+          message: "Something went wrong",
         };
       }
-      return {
-        success: true,
-        message: "Please check email, for verification code",
-      };
-    }
-
-    async function login(
-      code: string,
-      fcmtoken?: string,
-      title?: string
-    ): Promise<LoginResponse> {
-      return new Promise((resolve, reject) => {
-        repositories.authenticationRepository
-          .getValidateCode(code)
-          .then((response) => {
-            if (!response) {
-              resolve({
-                success: false,
-                message: "User not found",
-              });
-            }
-
-            if (typeof response === "boolean") {
-              resolve({
-                success: false,
-                message: "Could not find user token",
-              });
-              return;
-            }
-            updateFCMToken(response, fcmtoken, title)
-              .then()
-              .catch((error) => {
-                console.log(error);
-              });
-
-            const jwtToken = repositories.authenticationRepository.getJwtToken(
-              response as User
-            );
-
-            resolve({
-              success: true,
-              message: "Successfully logged in",
-              token: jwtToken,
-            });
-          })
-          .catch((error) => reject(error));
-      });
     }
 
     /**
@@ -195,7 +187,27 @@ export const authServiceFactory: IAuthServiceFactory = {
       });
     }
 
+    async function verify(token: string): Promise<{
+      success: boolean;
+      message: string;
+    }> {
+      return new Promise<{ success: boolean; message: string }>(
+        (resolve, reject) => {
+          repositories.authenticationRepository
+            .verifyAccount(token)
+            .then(() => {
+              resolve({
+                success: true,
+                message: "Successfully verified",
+              });
+            })
+            .catch((error) => reject(error));
+        }
+      );
+    }
+
     return {
+      verify,
       register,
       login,
     };

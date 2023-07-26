@@ -21,7 +21,7 @@ export interface INewsService {
    * @param {string} size - The number of articles to be displayed per page.
    * @return {Promise<Article[]>} - A promise that resolves to an array of articles.
    */
-  headlines(id: number, page: string, size: string): Promise<Article[]>;
+  headlines(id: string, page: string, size: string): Promise<Article[]>;
   /**
    * Retrieves news articles from the server.
    *
@@ -34,7 +34,7 @@ export interface INewsService {
    *                  failure.
    */
   allNews(
-    id: number,
+    id: string,
     page: string,
     size: string
   ): Promise<
@@ -64,7 +64,7 @@ export const newsServiceFactory = {
      * @param {string} size - The size of the article.
      * @return {Promise<Article[]>} A promise that resolves to an array of Article objects.
      */
-    async function headlines(id: number, page: string, size: string): Promise<Article[]> {
+    async function headlines(id: string, page: string, size: string): Promise<Article[]> {
       return new Promise<Article[]>((resolve, reject) => {
         let pageQuery = page as unknown as number;
         let sizeQuery = size as unknown as number;
@@ -82,7 +82,7 @@ export const newsServiceFactory = {
     }
 
     async function fetchNews(
-      id: number,
+      id: string,
       page: number,
       size: number
     ): Promise<Article[]> {
@@ -106,7 +106,7 @@ export const newsServiceFactory = {
       return { limit, offset };
     }
 
-    async function allNews(id: number, page: string, size: string) {
+    async function allNews(id: string, page: string, size: string) {
       try {
         let pageQuery = page as unknown as number;
         let sizeQuery = size as unknown as number;
@@ -147,7 +147,6 @@ export const newsServiceFactory = {
     async function requestUrl(urls: string[]) {
       try {
         const promises = [];
-        console.log(urls);
 
         for (let i = 0; i < urls.length; i++) {
           const promise = axios.get(urls[i]);

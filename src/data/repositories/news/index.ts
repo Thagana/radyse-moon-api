@@ -1,17 +1,15 @@
 import Articles from "../../infrastructure/db/entities/Articles";
 import Settings from "../../infrastructure/db/entities/NewsSettings";
 import ArticlesDOA from "../../infrastructure/db/entities/Articles";
-import SettingsDOA from "../../infrastructure/db/entities/NewsSettings";
 import { INewsRepository } from "../../../domain/news/news.repository";
 import Article from "../../../interface/articles-interface";
-import moment from "moment-timezone";
 export interface INewsRepositoryFactory {
   init(): INewsRepository;
 }
 
 export const newsServiceRepository: INewsRepositoryFactory = {
   init() {
-    async function getSettings(userId: number) {
+    async function getSettings(userId: string) {
       return new Promise<{ category: string; location: string }>(
         (resolve, reject) => {
           Settings.findOne({
