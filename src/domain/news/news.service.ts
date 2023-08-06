@@ -34,7 +34,7 @@ export interface INewsService {
    *                  failure.
    */
   allNews(
-    id: string,
+    id: number,
     page: string,
     size: string
   ): Promise<
@@ -82,7 +82,7 @@ export const newsServiceFactory = {
     }
 
     async function fetchNews(
-      id: string,
+      id: number,
       page: number,
       size: number
     ): Promise<Article[]> {
@@ -106,7 +106,7 @@ export const newsServiceFactory = {
       return { limit, offset };
     }
 
-    async function allNews(id: string, page: string, size: string) {
+    async function allNews(id: number, page: string, size: string) {
       try {
         let pageQuery = page as unknown as number;
         let sizeQuery = size as unknown as number;
@@ -157,7 +157,7 @@ export const newsServiceFactory = {
         for (let i = 0; i < results.length; i++) {
           const data = results[i].data;
           const articles = data.articles;
-          const dataFormat: any[] = articles.map((item: any) => {
+          const dataFormat: any[] = articles.map((item: { title: any; source: { name: any; }; author: any; url: any; urlToImage: any; publishedAt: any; description: any; }) => {
             return {
               id: v4(),
               title: item.title || "Unknown",

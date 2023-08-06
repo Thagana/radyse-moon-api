@@ -1,6 +1,6 @@
 class UserResponse {
   constructor(
-    public readonly id: string,
+    public readonly id: number,
     public readonly first_name: string,
     public readonly last_name: string,
     public readonly email: string,

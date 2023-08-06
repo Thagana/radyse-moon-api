@@ -1,8 +1,11 @@
 import nodemailer from 'nodemailer';
+import { Expo } from 'expo-server-sdk';
 import { INotificationRepository } from "../../../domain/notification/notification.repository";
 import { configs } from '../../../configs/app.configs';
 import ejs from 'ejs';
 import path from 'path';
+import { User } from '../../../domain/users/model';
+import PushTokens from '../../infrastructure/db/entities/PushTokens';
 
 export interface INotificationRepositoryFactory {
   init(): INotificationRepository;
@@ -45,8 +48,54 @@ export const notificationServiceRepository: INotificationRepositoryFactory = {
         console.error(error);
       }
     }
+    async function sendCropPushNotification(data: {title: string, description: string}[], pushTokens: string[]) {
+      try {
+        let expo = new Expo();
+        let messages = [];
+        for (let pushToken of pushTokens) {
+          if (!Expo.isExpoPushToken(pushToken)) {
+            console.error(`Push token ${pushToken} is not a valid Expo push token`);
+            continue;
+          }
+          for (let payload of data) {
+            messages.push({
+              to: pushToken,
+              body: payload.description,
+              title: payload.title,
+            })
+          }
+        }
+        let chunks = expo.chunkPushNotifications(messages);
+        let tickets = [];
+        for (let chunk of chunks) {
+          let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+          console.log(ticketChunk);
+          tickets.push(...ticketChunk);
+        }
+      } catch (error) {
+        console.error(error);   
+      }
+    }
+
+    async function getPushTokens(users: User[]) {
+      return new Promise<string[]>((resolve, reject) => {
+        PushTokens.findAll({
+          where: {
+            userId: {
+              in: users.map((user) => user.id),
+            },
+          },
+        }).then((response) => {
+          resolve(response.map((item) => item.token));
+        }).catch((error) => {
+          reject(error);
+        })
+      })
+    }
     return {
+      getPushTokens,
       sendVerificationNotification,
+      sendCropPushNotification
     };
   },
 };
