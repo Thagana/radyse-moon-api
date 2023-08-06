@@ -125,7 +125,7 @@ export const userServiceRepository: IUsersRepositoryFactory = {
         try {
           const oldToken = await PushTokensDOA.findOne({
             where: {
-              user_id: user.id,
+              userId: user.id,
             },
           });
           if (oldToken) {
@@ -135,13 +135,13 @@ export const userServiceRepository: IUsersRepositoryFactory = {
               },
               {
                 where: {
-                  user_id: user.id,
+                  userId: user.id,
                 },
               }
             );
           } else {
             await PushTokensDOA.create({
-              user_id: user.id,
+              userId: user.id,
               token: token,
               title: title,
             });

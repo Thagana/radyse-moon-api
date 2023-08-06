@@ -4,18 +4,22 @@ import config from '../../../../configs/db.configs';
 
 interface PushTokenAttributes {
     id: string;
-    user_id: number;
+    userId: number;
     title: string;
     token: string;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
-type PushTokenCreationAttributes = Optional<PushTokenAttributes, 'id'>;
+type PushTokenCreationAttributes = Optional<PushTokenAttributes, 'id' | 'createdAt' | 'updatedAt'>;
 
 class PushToken extends Model<PushTokenAttributes, PushTokenCreationAttributes> implements PushTokenAttributes {
     public id!: string;
-    public user_id!: number;
+    public userId!: number;
     public title!: string;
     public token!: string;
+    public createdAt!: Date;
+    public updatedAt!: Date;
 }
 
 PushToken.init({
@@ -25,7 +29,7 @@ PushToken.init({
         autoIncrement: true,
         allowNull: false,
     },
-    user_id: {
+    userId: {
         type: DataTypes.NUMBER,
         allowNull: false,
     },
@@ -36,6 +40,16 @@ PushToken.init({
     token: {
         type: DataTypes.STRING,
         allowNull: false,
+    },
+    createdAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW
+    },
+    updatedAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW
     }
 }, {
     tableName: "push_tokens",
