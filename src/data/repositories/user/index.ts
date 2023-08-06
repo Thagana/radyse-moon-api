@@ -1,14 +1,15 @@
 // DOA
 import User from "../../infrastructure/db/entities/User";
 import NewsSettingsDOA from "../../infrastructure/db/entities/NewsSettings";
-import UserMetaDOA from "../../infrastructure/db/entities/UserMeta";
 import PushTokensDOA from "../../infrastructure/db/entities/PushTokens";
 import parser from "ua-parser-js";
 import { Database } from "../../infrastructure/db/index";
+import PushTokens from '../../infrastructure/db/entities/PushTokens';
 
 import { IUsersRepository } from "../../../domain/users/user.repository";
 import { Mailer } from "../../../helpers/Mailer/Mailer";
 import { IncomingHttpHeaders } from "http";
+import { Op } from "sequelize";
 
 interface IUsersRepositoryFactory {
   init(): IUsersRepository;
@@ -125,7 +126,7 @@ export const userServiceRepository: IUsersRepositoryFactory = {
         try {
           const oldToken = await PushTokensDOA.findOne({
             where: {
-              user_id: user.id,
+              userId: user.id,
             },
           });
           if (oldToken) {
@@ -135,13 +136,13 @@ export const userServiceRepository: IUsersRepositoryFactory = {
               },
               {
                 where: {
-                  user_id: user.id,
+                  userId: user.id,
                 },
               }
             );
           } else {
             await PushTokensDOA.create({
-              user_id: user.id,
+              userId: user.id,
               token: token,
               title: title,
             });
@@ -153,7 +154,7 @@ export const userServiceRepository: IUsersRepositoryFactory = {
       });
     }
 
-    async function getSettings(id: string) {
+    async function getSettings(id: number) {
       return new Promise<{
         language: string;
         location: string;
@@ -186,7 +187,36 @@ export const userServiceRepository: IUsersRepositoryFactory = {
           .catch((error) => reject(error));
       });
     }
+    async function getUsers() {
+      return new Promise<User[]>((resolve, reject) => {
+        User.findAll({
+          raw: true,
+        })
+          .then((response) => {
+            resolve(response);
+          })
+          .catch((error) => reject(error));
+      });
+    }
+    async function getPushTokens(users: {userId: number}[]) {
+      const conn = users.map((user) => user.userId)
+      return new Promise<string[]>((resolve, reject) => {
+        PushTokens.findAll({
+          where: {
+            userId: {
+              [Op.in]: conn,
+            },
+          },
+        }).then((response) => {
+          resolve(response.map((item) => item.token));
+        }).catch((error) => {
+          reject(error);
+        })
+      })
+    }
     return {
+      getPushTokens,
+      getUsers,
       updateToken,
       findUser,
       createUser,

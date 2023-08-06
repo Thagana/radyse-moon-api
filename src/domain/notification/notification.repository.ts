@@ -1,3 +1,5 @@
+import Article from "../../interface/articles-interface";
+
 export interface INotificationRepository {
     sendVerificationNotification(
         firstName: string,
@@ -5,4 +7,5 @@ export interface INotificationRepository {
         email: string,
         token: string | undefined,
     ): Promise<void>;
+    sendCropPushNotification(data: { title: string, description: string }[], pushTokens: string[]): Promise<void>;
 }

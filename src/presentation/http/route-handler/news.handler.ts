@@ -26,7 +26,7 @@ export const headlineHandler = async (
 export const allNewsHandler = async (service: IServices, request: Request, response: Response) => {
   try {
       // @ts-ignore 
-      const id = request?.user?.user_id as string;
+      const id = request?.user?.user_id as number;
       const {  page, size } = request.query as unknown as {  page: string, size: string};
       const news = await service.newsService.allNews(id, page, size);
       return response.status(200).json(news);
@@ -41,7 +41,9 @@ export const allNewsHandler = async (service: IServices, request: Request, respo
 
 export const fetchNewsHandle = async (service: IServices, request: Request, response: Response) => {
   try {
-    const fetched = await service.newsService.fetchArticles(request.body.KEY);
+    const key = request.query['KEY'] as string;
+    const fetched = await service.newsService.fetchArticles(key);
+    await service.notificationService.sendCronFetchedArticlesNotification(fetched.data);
     return response.status(200).json(fetched);
   } catch (error) {
     console.log(error);

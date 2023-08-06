@@ -111,14 +111,14 @@ export const authServiceRepository: IAuthRepositoryFactory = {
             },
             {
               where: {
-                user_id: id,
+                userId: id,
               },
             }
           );
         } else {
           await PushToken.create({
             title: "tagging",
-            user_id: id,
+            userId: id,
             token: fcmtoken,
           });
         }

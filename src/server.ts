@@ -69,6 +69,6 @@ const app = appServerFactory.init({
   notificationService
 });
 
-let server = app.listen(process.env.PORT, () => {
+app.listen(process.env.PORT, () => {
   logger.info(`Listening on http://localhost:${process.env.PORT}`);
 });
