@@ -16,7 +16,7 @@ export interface IUsersRepository {
   findUser(email: string): Promise<User | boolean>;
   updateToken(token: string, user: User): Promise<boolean>;
   updatePushToken(token: string, user: User, title: string): Promise<boolean>;
-  getSettings(id: string): Promise<{
+  getSettings(id: number): Promise<{
     language: string;
     location: string;
     category: string;
@@ -26,4 +26,6 @@ export interface IUsersRepository {
     web_push_notification: number;
     sms_notification: number;
   }>;
+  getUsers(): Promise<User[]>;
+  getPushTokens(users: {userId: number}[]): Promise<string[]>;
 }

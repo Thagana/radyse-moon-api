@@ -9,7 +9,7 @@ export interface INewsRepositoryFactory {
 
 export const newsServiceRepository: INewsRepositoryFactory = {
   init() {
-    async function getSettings(userId: string) {
+    async function getSettings(userId: number) {
       return new Promise<{ category: string; location: string }>(
         (resolve, reject) => {
           Settings.findOne({

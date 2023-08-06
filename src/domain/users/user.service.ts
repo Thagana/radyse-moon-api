@@ -1,6 +1,6 @@
 import { IRepositories } from "./../../interface/IRepository";
 export interface IUserService {
-  getSettings(id: string): Promise<{
+  getSettings(id: number): Promise<{
     language: string;
     location: string;
     category: string;
@@ -18,7 +18,7 @@ export interface IUserServiceFactory {
 
 export const userServiceFactory = {
   init(repository: IRepositories) {
-    async function getSettings(id: string) {
+    async function getSettings(id: number) {
       try {
         const settings = await repository.userRepository.getSettings(id);
         return settings;
