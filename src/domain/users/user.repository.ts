@@ -1,3 +1,4 @@
+import { Settings } from "../../interface/Settings.interface";
 import { User } from "./model";
 import { IncomingHttpHeaders } from "http";
 
@@ -28,4 +29,5 @@ export interface IUsersRepository {
   }>;
   getUsers(): Promise<User[]>;
   getPushTokens(users: {userId: number}[]): Promise<string[]>;
+  updateSettings(id: number, settings: Settings): Promise<void>;
 }

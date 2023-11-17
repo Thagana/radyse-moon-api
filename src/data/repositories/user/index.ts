@@ -10,6 +10,7 @@ import { IUsersRepository } from "../../../domain/users/user.repository";
 import { Mailer } from "../../../helpers/Mailer/Mailer";
 import { IncomingHttpHeaders } from "http";
 import { Op } from "sequelize";
+import { Settings } from "../../../interface/Settings.interface";
 
 interface IUsersRepositoryFactory {
   init(): IUsersRepository;
@@ -214,7 +215,26 @@ export const userServiceRepository: IUsersRepositoryFactory = {
         })
       })
     }
+    async function updateSettings(id: number, settings: Settings) {
+      return new Promise<void>((resolve, reject) => {
+        NewsSettingsDOA.update(
+          {
+            ...settings,
+          },
+          {
+            where: {
+              user_id: id,
+            },
+          }
+        )
+          .then((response) => {
+            resolve();
+          })
+          .catch((error) => reject(error));
+      });
+    }
     return {
+      updateSettings,
       getPushTokens,
       getUsers,
       updateToken,

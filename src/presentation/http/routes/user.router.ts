@@ -1,4 +1,4 @@
-import { settingsHandler } from './../route-handler/user.handler';
+import { settingsHandler, updateSettingsHandle } from './../route-handler/user.handler';
 import express, { Response, Router, Request } from "express";
 import { IServices } from "../../../interface/IService";
 
@@ -9,6 +9,9 @@ export class UserRoutes {
     router.get("/settings", (request: Request, response: Response) =>
       settingsHandler(services, request, response)
     );
+    router.post('/settings',async (request: Request, response: Response) => {
+      updateSettingsHandle(services, request, response);
+    })
     return router;
   }
 }

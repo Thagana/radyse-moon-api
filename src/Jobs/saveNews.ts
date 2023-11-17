@@ -116,7 +116,7 @@ const saveNewsCron = cron.schedule("0 0 * * *", async () => {
           // Send Notification
           const token = await PushTokens.findOne({
             where: {
-              user_id: settings[i].user_id,
+              userId: settings[i].user_id,
             }
           })
 
