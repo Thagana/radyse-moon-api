@@ -125,7 +125,7 @@ const saveNewsCron = cron.schedule("0 0 * * *", async () => {
               await sendPushNotification(token.token, saved.data);
               logger.info("PUSH SENT ...");
             } else {
-              logger.info("PUSH NOT SENT [TOKEN_NOT_FOUND] ...");
+              logger.info("PUSH NOT SENT [TOKEN_NOT_FOUND]");
             }
           }
           const user = await UserModel.findOne({
