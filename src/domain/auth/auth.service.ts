@@ -119,7 +119,7 @@ export const authServiceFactory: IAuthServiceFactory = {
 
 
     function validateRegisterInputData(payload: { email: string, password: string, firstName: string, lastName: string }) {
-      let errors = [];
+      const errors = [];
       if (!payload.email) {
         errors.push({ 
           message: "Email is required"
@@ -144,7 +144,7 @@ export const authServiceFactory: IAuthServiceFactory = {
     }
 
     function validateLoginInputData (payload: { email: string, password: string }) {
-      let errors = [];
+      const errors = [];
       if (!payload.email) {
         errors.push({ 
           message: "Email is required"

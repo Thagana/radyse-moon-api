@@ -7,4 +7,4 @@ export interface IServices {
   newsService: INewsService,
   userService: IUserService,
   notificationService: INotificationService
-};
+}

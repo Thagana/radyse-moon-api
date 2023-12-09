@@ -50,14 +50,14 @@ export const notificationServiceRepository: INotificationRepositoryFactory = {
     }
     async function sendCropPushNotification(data: {title: string, description: string}[], pushTokens: string[]) {
       try {
-        let expo = new Expo();
-        let messages = [];
-        for (let pushToken of pushTokens) {
+        const expo = new Expo();
+        const messages = [];
+        for (const pushToken of pushTokens) {
           if (!Expo.isExpoPushToken(pushToken)) {
             console.error(`Push token ${pushToken} is not a valid Expo push token`);
             continue;
           }
-          for (let payload of data) {
+          for (const payload of data) {
             messages.push({
               to: pushToken,
               body: payload.description,
@@ -65,10 +65,10 @@ export const notificationServiceRepository: INotificationRepositoryFactory = {
             })
           }
         }
-        let chunks = expo.chunkPushNotifications(messages);
-        let tickets = [];
-        for (let chunk of chunks) {
-          let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+        const chunks = expo.chunkPushNotifications(messages);
+        const tickets = [];
+        for (const chunk of chunks) {
+          const ticketChunk = await expo.sendPushNotificationsAsync(chunk);
           console.log(ticketChunk);
           tickets.push(...ticketChunk);
         }

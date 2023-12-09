@@ -200,7 +200,7 @@ export const newsServiceFactory = {
 
     const urlBuilder = (locations: string[], categories: string[]) => {
       try {
-        let urls: string[] = [];
+        const urls: string[] = [];
         locations.forEach((l) => {
           categories.forEach((c) => {
             const link = `https://newsapi.org/v2/top-headlines?country=${l}&category=${c}&apiKey=${configs.NEW_ENDPOINT}`;

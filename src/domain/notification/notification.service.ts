@@ -21,8 +21,8 @@ export const notificationServiceFactory: INotificationServiceFactory = {
     async function sendCronFetchedArticlesNotification(fetched: Article[]) {
       try {
         const users = await repository.userRepository.getUsers();
-        let config: {userId: number}[] = [];
-        for (let user of users) {
+        const config: {userId: number}[] = [];
+        for (const user of users) {
           const settings = await repository.userRepository.getSettings(user.id);
           if (settings.push_enabled) {
             config.push({
