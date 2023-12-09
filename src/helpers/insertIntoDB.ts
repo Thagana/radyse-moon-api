@@ -1,6 +1,6 @@
 import logger from "../utils/logger";
 import News from '../data/infrastructure/db/entities/Articles';
-
+import { v4 as uuidv4 } from 'uuid';
 interface Articles {
     id: string;
     title: string;
@@ -19,10 +19,24 @@ interface Articles {
 
 const insertIntoDB = async (data: Articles[]): Promise<void> => {
     try {
-        await News.bulkCreate(data);
+        for (const item of data) {
+            await News.create({
+                id: item.id || uuidv4(),
+                source: item.source,
+                description: item.description,
+                dateCreated: item.description,
+                publishedAt: item.publishedAt,
+                author: item.author,
+                title: item.title,
+                location: item.location,
+                category: item.category,
+                url: item.url,
+                urlToImage: item.urlToImage,
+                country: item.country
+            });
+        }
     } catch (error) {
         console.log(error);
-        logger.error(error);
     }
 };
 

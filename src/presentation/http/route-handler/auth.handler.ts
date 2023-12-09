@@ -31,11 +31,12 @@ export const registerHandler = async (
   try {
     const { email, password, firstName, lastName } = request.body;
     const { headers } = request;
-    const { success, token, message } = await service.authService.register(firstName, lastName, email, password, headers);
+    const { success, token, message, errors } = await service.authService.register(firstName, lastName, email, password, headers);
     if (!success) {
       return response.status(400).json({
         success: false,
         message: message,
+        errors
       });
     }
     

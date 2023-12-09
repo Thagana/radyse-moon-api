@@ -7,5 +7,6 @@ export interface LoginResponse {
 export interface RegisterResponse {
     success: boolean;
     message: string;
+    errors?: {message: string}[];
     token?: string
 }

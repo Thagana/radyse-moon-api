@@ -128,20 +128,28 @@ export const newsServiceFactory = {
     }
 
     async function fetchArticles(KEY: string) {
-      if (KEY !== configs.CRON_KEY) {
+      try {
+        if (KEY !== configs.CRON_KEY) {
+          return {
+            success: false,
+            data: [],
+          };
+        }
+  
+        const locations = ["za", "us", "gb"];
+        const categories = ["general"];
+  
+        const urls = urlBuilder(locations, categories);
+        const request = await requestUrl(urls);
+        await insertIntoDB(request.data);
+        return request;
+      } catch (error) {
+        console.log(error);
         return {
           success: false,
           data: [],
         };
       }
-
-      const locations = ["za", "us", "gb"];
-      const categories = ["general"];
-
-      const urls = urlBuilder(locations, categories);
-      const request = await requestUrl(urls);
-      await insertIntoDB(request.data);
-      return request;
     }
 
     async function requestUrl(urls: string[]) {
@@ -172,6 +180,7 @@ export const newsServiceFactory = {
               dateCreated: new Date().toISOString(),
               country: "all",
               category: "category",
+              location: 'ZA',
             };
           });
           ArtD.push(...dataFormat);

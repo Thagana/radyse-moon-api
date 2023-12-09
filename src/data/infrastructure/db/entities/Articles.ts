@@ -5,7 +5,6 @@ import config from "../../../../configs/db.configs";
 export interface ArticleAttribute {
   id: string;
   source: string;
-  image: string;
   description: string;
   dateCreated: string;
   publishedAt: string;
@@ -26,7 +25,6 @@ class Article
 {
   public id!: string;
   public source!: string;
-  public image!: string;
   public description!: string;
   public dateCreated!: string;
   public publishedAt!: string;
@@ -45,10 +43,6 @@ Article.init(
       type: DataTypes.TEXT,
       allowNull: false,
       primaryKey: true
-    },
-    image: {
-      type: DataTypes.TEXT,
-      allowNull: false,
     },
     source: {
       type: DataTypes.TEXT,
