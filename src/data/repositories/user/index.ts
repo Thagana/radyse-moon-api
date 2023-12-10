@@ -1,14 +1,13 @@
+/* eslint-disable no-async-promise-executor */
 // DOA
 import User from "../../infrastructure/db/entities/User";
 import NewsSettingsDOA from "../../infrastructure/db/entities/NewsSettings";
 import PushTokensDOA from "../../infrastructure/db/entities/PushTokens";
-import parser from "ua-parser-js";
 import { Database } from "../../infrastructure/db/index";
 import PushTokens from '../../infrastructure/db/entities/PushTokens';
 
 import { IUsersRepository } from "../../../domain/users/user.repository";
 import { Mailer } from "../../../helpers/Mailer/Mailer";
-import { IncomingHttpHeaders } from "http";
 import { Op } from "sequelize";
 
 interface IUsersRepositoryFactory {
@@ -23,7 +22,6 @@ export const userServiceRepository: IUsersRepositoryFactory = {
       email: string,
       hashPassword: string,
       emailCode: string,
-      headers: IncomingHttpHeaders
     ): Promise<{ success: boolean; message: string }> {
       const db = new Database(process.env.DATABASE_URI || "");
       const transaction = await db.sequelize.transaction();
@@ -107,7 +105,7 @@ export const userServiceRepository: IUsersRepositoryFactory = {
             },
           }
         )
-          .then((response) => {
+          .then(() => {
             resolve(true);
           })
           .catch((error) => reject(error));

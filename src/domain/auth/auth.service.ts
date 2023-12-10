@@ -1,6 +1,5 @@
 import { IRepositories } from "../../interface/IRepository";
-import { LoginResponse, RegisterResponse } from "../../interface/IResponse";
-import { User } from "../users/model";
+import { RegisterResponse } from "../../interface/IResponse";
 import { IncomingHttpHeaders } from "http";
 
 // SERVICE INTERFACE
@@ -222,30 +221,6 @@ export const authServiceFactory: IAuthServiceFactory = {
           message: "Something went wrong",
         };
       }
-    }
-
-    /**
-     *
-     * @param user
-     * @param fcmtoken
-     * @param title
-     * @returns
-     */
-    async function updateFCMToken(
-      user: User,
-      fcmtoken?: string,
-      title?: string
-    ) {
-      return new Promise((resolve, reject) => {
-        if (fcmtoken && title) {
-          repositories.userRepository
-            .updatePushToken(fcmtoken, user, title)
-            .then((response) => {
-              resolve(response);
-            })
-            .catch((error) => reject(error));
-        }
-      });
     }
 
     async function verify(token: string): Promise<{

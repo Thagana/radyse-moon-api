@@ -1,4 +1,4 @@
-import express, { Response, Router, Request } from "express";
+import express, { Response, Request } from "express";
 import { IServices } from "../../../interface/IService";
 import { loginHandler, registerHandler, verifyHandler } from "../route-handler/auth.handler";
 

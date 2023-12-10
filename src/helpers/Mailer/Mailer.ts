@@ -1,5 +1,4 @@
 import nodemailer from "nodemailer";
-import Logger from "../../utils/logger";
 import { configs } from "../../configs/app.configs";
 
 export class Mailer {
@@ -36,7 +35,7 @@ export class Mailer {
       };
       transporter
         .sendMail(message)
-        .then((response) => {
+        .then(() => {
           resolve(true);
         })
         .catch((error) => reject(error));

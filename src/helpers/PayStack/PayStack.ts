@@ -1,4 +1,4 @@
-import axios, { Axios } from "axios";
+import axios from "axios";
 import IPlan from "../../interface/plan-interface";
 import { Transaction } from "../../interface/Transaction-interface";
 import {

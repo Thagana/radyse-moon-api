@@ -1,5 +1,5 @@
 interface Article {
-    id: any;
+    id: string;
     title: string;
     source: string;
     author: string;

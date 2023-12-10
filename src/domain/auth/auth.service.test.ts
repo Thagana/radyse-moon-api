@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { describe, test, expect } from "vitest";
 
 import { authServiceFactory } from "./auth.service";

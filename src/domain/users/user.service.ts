@@ -23,7 +23,16 @@ export const userServiceFactory = {
         const settings = await repository.userRepository.getSettings(id);
         return settings;
       } catch (error) {
-        throw error
+        return {
+          language: "",
+          location: "",
+          category: "",
+          frequency: 0,
+          push_enabled: 0,
+          email_notification: 0,
+          web_push_notification: 0,
+          sms_notification: 0,
+        };
       }
     }
     return {

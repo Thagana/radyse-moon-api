@@ -1,4 +1,3 @@
-import axios from "axios";
 import webpush from "web-push";
 import logger from "../utils/logger";
 import { configs } from "../configs/app.configs";

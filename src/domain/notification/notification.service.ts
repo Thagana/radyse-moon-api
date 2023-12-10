@@ -1,5 +1,4 @@
 import { IRepositories } from "../../interface/IRepository";
-import util from "util";
 import Article from "../../interface/articles-interface";
 
 export interface INotificationService {

@@ -1,3 +1,4 @@
+/* eslint-disable no-async-promise-executor */
 import Articles from "../../infrastructure/db/entities/Articles";
 import Settings from "../../infrastructure/db/entities/NewsSettings";
 import ArticlesDOA from "../../infrastructure/db/entities/Articles";
