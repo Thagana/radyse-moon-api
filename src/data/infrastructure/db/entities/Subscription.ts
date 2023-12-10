@@ -1,4 +1,4 @@
-import { Schema , model, Mixed} from "mongoose";
+import { Schema , model} from "mongoose";
 import { SubscriptionData } from '../../../../interface/Subscription-interface'
 
 const schema = new Schema<SubscriptionData>({

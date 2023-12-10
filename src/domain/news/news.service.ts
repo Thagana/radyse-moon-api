@@ -5,6 +5,22 @@ import insertIntoDB from "../../helpers/insertIntoDB";
 import Article from "../../interface/articles-interface";
 import { IRepositories } from "../../interface/IRepository";
 
+interface Articles {
+  id: string;
+  title: string;
+  source: string;
+  author: string;
+  url: string;
+  urlToImage: string;
+  publishedAt: string;
+  dateCreated: string;
+  country: string;
+  category: string;
+  image: string;
+  description: string;
+  location: string;
+}
+
 export interface INewsService {
   /**
    * Fetches articles from the server given a KEY.
@@ -12,7 +28,7 @@ export interface INewsService {
    * @param {string} KEY - The key to use to fetch the articles.
    * @return {Promise<{ success: boolean; data: any[] }>} - A promise that resolves to an object containing a success boolean and an array of data.
    */
-  fetchArticles(KEY: string): Promise<{ success: boolean; data: any[] }>;
+  fetchArticles(KEY: string): Promise<{ success: boolean; data: Article[] }>;
   /**
    * Retrieves headlines of articles based on the page and size provided.
    *
@@ -64,7 +80,11 @@ export const newsServiceFactory = {
      * @param {string} size - The size of the article.
      * @return {Promise<Article[]>} A promise that resolves to an array of Article objects.
      */
-    async function headlines(id: string, page: string, size: string): Promise<Article[]> {
+    async function headlines(
+      id: string,
+      page: string,
+      size: string
+    ): Promise<Article[]> {
       return new Promise<Article[]>((resolve, reject) => {
         let pageQuery = page as unknown as number;
         let sizeQuery = size as unknown as number;
@@ -135,10 +155,10 @@ export const newsServiceFactory = {
             data: [],
           };
         }
-  
+
         const locations = ["za", "us", "gb"];
         const categories = ["general"];
-  
+
         const urls = urlBuilder(locations, categories);
         const request = await requestUrl(urls);
         await insertIntoDB(request.data);
@@ -165,24 +185,35 @@ export const newsServiceFactory = {
         for (let i = 0; i < results.length; i++) {
           const data = results[i].data;
           const articles = data.articles;
-          const dataFormat: any[] = articles.map((item: { title: any; source: { name: any; }; author: any; url: any; urlToImage: any; publishedAt: any; description: any; }) => {
-            return {
-              id: v4(),
-              title: item.title || "Unknown",
-              source: item.source.name || "Unknown",
-              author: item.author || "Unknown",
-              url: item.url,
-              urlToImage:
-                item.urlToImage ||
-                "https://avatars.githubusercontent.com/u/68122202?s=400&u=4abc9827a8ca8b9c19b06b9c5c7643c87da51e10&v=4",
-              publishedAt: item.publishedAt || "Unknown",
-              description: item.description || "Not Available",
-              dateCreated: new Date().toISOString(),
-              country: "all",
-              category: "category",
-              location: 'ZA',
-            };
-          });
+          const dataFormat: Articles[] = articles.map(
+            (item: {
+              title: string;
+              source: { name: string };
+              author: string;
+              url: string;
+              urlToImage: string;
+              publishedAt: string;
+              description: string;
+              image: string;
+            }) => {
+              return {
+                id: v4(),
+                title: item.title || "Unknown",
+                source: item.source.name || "Unknown",
+                author: item.author || "Unknown",
+                url: item.url,
+                urlToImage:
+                  item.urlToImage ||
+                  "https://avatars.githubusercontent.com/u/68122202?s=400&u=4abc9827a8ca8b9c19b06b9c5c7643c87da51e10&v=4",
+                publishedAt: item.publishedAt || "Unknown",
+                description: item.description || "Not Available",
+                dateCreated: new Date().toISOString(),
+                country: "all",
+                category: "category",
+                location: "ZA",
+              };
+            }
+          );
           ArtD.push(...dataFormat);
         }
         return {
@@ -200,7 +231,7 @@ export const newsServiceFactory = {
 
     const urlBuilder = (locations: string[], categories: string[]) => {
       try {
-        let urls: string[] = [];
+        const urls: string[] = [];
         locations.forEach((l) => {
           categories.forEach((c) => {
             const link = `https://newsapi.org/v2/top-headlines?country=${l}&category=${c}&apiKey=${configs.NEW_ENDPOINT}`;

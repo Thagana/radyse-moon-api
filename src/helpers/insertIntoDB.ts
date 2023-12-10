@@ -1,4 +1,3 @@
-import logger from "../utils/logger";
 import News from '../data/infrastructure/db/entities/Articles';
 import { v4 as uuidv4 } from 'uuid';
 interface Articles {

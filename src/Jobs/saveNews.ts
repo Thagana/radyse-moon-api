@@ -67,7 +67,7 @@ const saveNews = async (
     if (response.status === 200) {
       const data = response.data;
       const articles: ArticleResponse[] = data.articles;
-      const dateFormat: DataFormat[] = articles.map((item, index) => {
+      const dateFormat: DataFormat[] = articles.map((item) => {
         return {
           id: v4(),
           title: item.title || "Unknown",

@@ -6,7 +6,8 @@ export const settingsHandler = async (
   response: Response
 ) => {
   try {
-    // @ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
     const id = request?.auth?.id as number;
     const settings = await service.userService.getSettings(id);
     return response.status(200).json({

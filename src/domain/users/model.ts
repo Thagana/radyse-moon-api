@@ -1,4 +1,4 @@
-class UserResponse {
+export class UserResponse {
   constructor(
     public readonly id: number,
     public readonly first_name: string,
