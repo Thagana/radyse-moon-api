@@ -13,7 +13,7 @@ export interface Log {
   errors: number;
   success: boolean;
   mobile: boolean;
-  input: any[];
+  input: string[];
   channel: string;
   history: { type: string; message: string; time: number }[];
 }

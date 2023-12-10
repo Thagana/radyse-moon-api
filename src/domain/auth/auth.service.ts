@@ -1,6 +1,5 @@
 import { IRepositories } from "../../interface/IRepository";
-import { LoginResponse, RegisterResponse } from "../../interface/IResponse";
-import { User } from "../users/model";
+import { RegisterResponse } from "../../interface/IResponse";
 import { IncomingHttpHeaders } from "http";
 
 // SERVICE INTERFACE
@@ -12,6 +11,14 @@ export interface IAuthService {
     password: string,
     headers: IncomingHttpHeaders
   ): Promise<RegisterResponse>;
+  /**
+   * Authenticates a user by logging them in.
+   *
+   * @param {string} email - The email address of the user.
+   * @param {string} password - The password of the user.
+   * @param {string} [fcmtoken] - The FCM token for push notifications.
+   * @return {Promise<{success: boolean, message: string, data?: {profile: {firstName: string, lastName: string, fullName: string, email: string, avatar: string}}}>} - A promise that resolves to an object containing the success status, a message, and optionally the user's profile data.
+   */
   login(
     email: string,
     password: string,
@@ -49,6 +56,21 @@ export const authServiceFactory: IAuthServiceFactory = {
       headers: IncomingHttpHeaders
     ): Promise<RegisterResponse> {
       try {
+        const isValidData = validateRegisterInputData({
+          firstName,
+          lastName,
+          email,
+          password
+        })
+        
+        if (isValidData.length > 0) {
+          return {
+            success: false,
+            message: 'Invalid form data',
+            errors: isValidData,
+          }
+        }
+
         const ALPHABET = "0123456789";
 
         const emailCode =
@@ -94,6 +116,46 @@ export const authServiceFactory: IAuthServiceFactory = {
       }
     }
 
+
+    function validateRegisterInputData(payload: { email: string, password: string, firstName: string, lastName: string }) {
+      const errors = [];
+      if (!payload.email) {
+        errors.push({ 
+          message: "Email is required"
+        });
+      }
+      if (!payload.password) {
+        errors.push({ 
+          message: "Password is required"
+        })
+      }
+      if (!payload.firstName) {
+        errors.push({ 
+          message: "First is required"
+        })
+      }
+      if (!payload.lastName) {
+        errors.push({ 
+          message: "Last Name is require"
+      })
+      }
+      return errors
+    }
+
+    function validateLoginInputData (payload: { email: string, password: string }) {
+      const errors = [];
+      if (!payload.email) {
+        errors.push({ 
+          message: "Email is required"
+        });
+      }
+      if (!payload.password) {
+        errors.push({ 
+          message: "Password is required"
+        })
+      }
+      return errors
+    }
     async function login(
       email: string,
       password: string,
@@ -101,45 +163,43 @@ export const authServiceFactory: IAuthServiceFactory = {
     ) {
       try {
         // if email is provided fail
-        if (!email) {
-          return { success: false, message: "Email is required" };
+        const isValidData = validateLoginInputData({
+          email,
+          password
+        })
+        if (isValidData.length > 0) {
+          return {
+            success: false,
+            errors: isValidData,
+            message: 'Invalid form data',
+          }
         }
-        // if password is provided fail
-        if (!password) {
-          return { success: false, message: "Password is required" };
-        }
-        // if both email and password are provided fail
-        if (!email || !password) {
-          return { success: false, message: "Email and password are required" };
-        }
-        // Email and password should be a string
-        if (typeof email !== "string") {
-          return { success: false, message: "Email should be a string" };
-        }
-        if (typeof password !== "string") {
-          return { success: false, message: "Password should be a string" };
-        }
+
         const user = await repositories.userRepository.findUser(email);
 
         if (typeof user === "boolean") {
           return { success: false, message: "Could not find user" };
         }
+        
         const is_verified = user.verified;
         if (!is_verified) {
           return { success: false, message: "Not yet activated your account" };
         }
+        
         const checkHashedPassword =
           repositories.authenticationRepository.checkHashedPassword(
             password,
             user.password
           );
+        
         if (!checkHashedPassword) {
           return { success: false, message: "Username or password incorrect!" };
         }
+
         const token = repositories.authenticationRepository.createToken(user.id);
-
-
+        
         await repositories.authenticationRepository.updateFCMToken(user.id, fcmtoken);
+        
         return {
           success: true,
           message: "Successfully loggedIn",
@@ -161,30 +221,6 @@ export const authServiceFactory: IAuthServiceFactory = {
           message: "Something went wrong",
         };
       }
-    }
-
-    /**
-     *
-     * @param user
-     * @param fcmtoken
-     * @param title
-     * @returns
-     */
-    async function updateFCMToken(
-      user: User,
-      fcmtoken?: string,
-      title?: string
-    ) {
-      return new Promise((resolve, reject) => {
-        if (fcmtoken && title) {
-          repositories.userRepository
-            .updatePushToken(fcmtoken, user, title)
-            .then((response) => {
-              resolve(response);
-            })
-            .catch((error) => reject(error));
-        }
-      });
     }
 
     async function verify(token: string): Promise<{

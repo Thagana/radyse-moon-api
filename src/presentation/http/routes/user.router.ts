@@ -1,5 +1,5 @@
 import { settingsHandler } from './../route-handler/user.handler';
-import express, { Response, Router, Request } from "express";
+import express, { Response, Request } from "express";
 import { IServices } from "../../../interface/IService";
 
 const router = express.Router({ mergeParams: true });

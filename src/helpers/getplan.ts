@@ -3,7 +3,7 @@ import Plan from "../data/infrastructure/db/entities/Plan";
 const getPlan = async (
   name: string,
   amount?: number
-): Promise<{ success: boolean; id: string; data: any }> => {
+): Promise<{ success: boolean; id: string; data: unknown }> => {
   try {
     if (amount) {
       const plan = await Plan.findOne({

@@ -7,7 +7,8 @@ export const headlineHandler = async (
   response: Response
 ) => {
   try {
-    // @ts-ignore 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error 
     const id = request?.user?.user_id as string;
     const page = request.query.page as string;
     const size = request.query.size as string;
@@ -25,7 +26,8 @@ export const headlineHandler = async (
 
 export const allNewsHandler = async (service: IServices, request: Request, response: Response) => {
   try {
-      // @ts-ignore 
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error 
       const id = request?.user?.user_id as number;
       const {  page, size } = request.query as unknown as {  page: string, size: string};
       const news = await service.newsService.allNews(id, page, size);

@@ -67,7 +67,7 @@ const saveNews = async (
     if (response.status === 200) {
       const data = response.data;
       const articles: ArticleResponse[] = data.articles;
-      const dateFormat: DataFormat[] = articles.map((item, index) => {
+      const dateFormat: DataFormat[] = articles.map((item) => {
         return {
           id: v4(),
           title: item.title || "Unknown",
@@ -116,7 +116,7 @@ const saveNewsCron = cron.schedule("0 0 * * *", async () => {
           // Send Notification
           const token = await PushTokens.findOne({
             where: {
-              user_id: settings[i].user_id,
+              userId: settings[i].user_id,
             }
           })
 
@@ -125,7 +125,7 @@ const saveNewsCron = cron.schedule("0 0 * * *", async () => {
               await sendPushNotification(token.token, saved.data);
               logger.info("PUSH SENT ...");
             } else {
-              logger.info("PUSH NOT SENT [TOKEN_NOT_FOUND] ...");
+              logger.info("PUSH NOT SENT [TOKEN_NOT_FOUND]");
             }
           }
           const user = await UserModel.findOne({

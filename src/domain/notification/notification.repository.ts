@@ -1,5 +1,3 @@
-import Article from "../../interface/articles-interface";
-
 export interface INotificationRepository {
     sendVerificationNotification(
         firstName: string,
