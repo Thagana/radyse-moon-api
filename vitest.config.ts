@@ -3,14 +3,19 @@ import { configDefaults, defineConfig } from 'vitest/config';
 
 const updatedConfig = defineConfig({
 	test: {
-		include: ['test/*.{test,spec}.{js,mjs,cjs,ts,mts,cts}'],
+		include: ['src/**/*.{test,spec}.{js,ts}'],
 		exclude: [
 			...configDefaults.exclude,
-			'**/packages/**',
-			'packages/**',
-			'packages',
-			'**/packages',
-			'/packages',
+			'**/node_modules/**',
+			'node_modules/**',
+			'node_modules',
+			'**/node_modules',
+			'/node_modules',
+			'**/build/**',
+			'build/**',
+			'build',
+			'**/build',
+			'/build',
 		],
 	},
 });
