@@ -1,6 +1,5 @@
 # Radyse Moon API
 
-[status](https://github.com/thagana/radyse-moon-api/actions/workflows/dev.yml/badge.svg?branch=dev)
-
+[![CI](https://github.com/Thagana/radyse-moon-api/actions/workflows/dev.yml/badge.svg)](https://github.com/Thagana/radyse-moon-api/actions/workflows/dev.yml)
 
 Radyse Moon API
