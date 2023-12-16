@@ -199,8 +199,6 @@ describe("AuthService - [login]", () => {
   test("Login Successfully", async () => {
     const login = await service.login("john@email.com", "password1");
     
-    console.log(login);
-
     expect(login).toStrictEqual({
       success: true,
       message: "Successfully loggedIn",
@@ -280,4 +278,50 @@ describe("AuthService - [login]", () => {
       ],
     });
   });
+
+  test("Login - [password and email must be a string]", async () => {
+    const email = 123 as unknown as string;
+    const password = 123 as unknown as string;
+    const login = await service.login(email, password);
+    expect(login).toStrictEqual({
+      success: false,
+      message: "Invalid form data",
+      errors: [
+        {
+          message: "Email must be a string",
+        },
+        {
+          message: "Password must be a string",
+        },
+      ],
+    });
+  })
+  test("Login - [password must be a string]", async () => {
+    const email = 'samuel@gmail.com';
+    const password = 123 as unknown as string;
+    const login = await service.login(email, password);
+    expect(login).toStrictEqual({
+      success: false,
+      message: "Invalid form data",
+      errors: [
+        {
+          message: "Password must be a string",
+        },
+      ],
+    });
+  })
+  test("Login - [email must be a string]", async () => {
+    const email = 123 as unknown as string;
+    const password = 'password'
+    const login = await service.login(email, password);
+    expect(login).toStrictEqual({
+      success: false,
+      message: "Invalid form data",
+      errors: [
+        {
+          message: "Email must be a string",
+        },
+      ],
+    });
+  })
 });
