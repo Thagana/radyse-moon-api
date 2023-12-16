@@ -149,9 +149,19 @@ export const authServiceFactory: IAuthServiceFactory = {
           message: "Email is required"
         });
       }
+      if (typeof payload.email !== "string") {
+        errors.push({ 
+          message: "Email must be a string"
+        });
+      }
       if (!payload.password) {
         errors.push({ 
           message: "Password is required"
+        })
+      }
+      if (typeof payload.password !== "string") {
+        errors.push({ 
+          message: "Password must be a string"
         })
       }
       return errors
