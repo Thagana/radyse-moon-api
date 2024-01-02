@@ -35,7 +35,6 @@ const userMockDb = [
   ),
 ];
 
-
 const authRepo: IAuthenticationRepository = {
   getValidateCode() {
     return new Promise<User | boolean>((resolve, reject) => {});
@@ -67,8 +66,8 @@ const authRepo: IAuthenticationRepository = {
       resolve();
     });
   },
-  generateLink(email: string) {
-    return "";
+  generateLink(ALPHABET: string) {
+    return "0123";
   },
 };
 
@@ -198,9 +197,7 @@ const repository: IRepositories = {
   notificationRepository: notificationRepo,
 };
 
-
 describe("AuthService - [login]", () => {
-
   const service = authServiceFactory.init(repository);
 
   test("Login Successfully", async () => {
@@ -328,7 +325,6 @@ describe("AuthService - [login]", () => {
     });
   });
 });
-
 describe("AuthService - [verify]", () => {
   const service = authServiceFactory.init(repository);
   test("Verify - [should be able to verify]", async () => {
@@ -346,4 +342,142 @@ describe("AuthService - [verify]", () => {
       message: "Successfully verified",
     });
   }, 50000);
+});
+describe("AuthService - [register]", () => {
+  const service = authServiceFactory.init(repository);
+  test("Register - [should fail to register for invalid form data - password]", async () => {
+    const headers = {} as IncomingHttpHeaders;
+    const register = await service.register(
+      "jane",
+      "doe",
+      "jane@email.com",
+      "",
+      headers
+    );
+    expect(register).toStrictEqual({
+      success: false,
+      message: "Invalid form data",
+      errors: [
+        {
+          message: "Password is required",
+        },
+      ],
+    });
+  })
+  test("Register - [should fail to register for invalid form data - first name]", async () => {
+    const headers = {} as IncomingHttpHeaders;
+    const register = await service.register(
+      "",
+      "doe",
+      "jane@email.com",
+      "password",
+      headers
+    );
+    expect(register).toStrictEqual({
+      success: false,
+      message: "Invalid form data",
+      errors: [
+        {
+          message: "First Name is required",
+        },
+      ],
+    });
+  })
+  test("Register - [should fail to register for invalid form data - last name]", async () => {
+    const headers = {} as IncomingHttpHeaders;
+    const register = await service.register(
+      "jane",
+      "",
+      "jane@email.com",
+      "password",
+      headers
+    );
+    expect(register).toStrictEqual({
+      success: false,
+      message: "Invalid form data",
+      errors: [
+        {
+          message: "Last Name is required",
+        },
+      ],
+    });
+  })
+  test("Register - [should fail to register for invalid form data - email]", async () => {
+    const headers = {} as IncomingHttpHeaders;
+    const register = await service.register(
+      "jane",
+      "doe",
+      "",
+      "password",
+      headers
+    );
+    expect(register).toStrictEqual({
+      success: false,
+      message: "Invalid form data",
+      errors: [
+        {
+          message: "Email is required",
+        },
+      ],
+    });
+  })
+  test("Register - [should fail to register for invalid form data - all missing]", async () => {
+    const headers = {} as IncomingHttpHeaders;
+    const register = await service.register(
+      "",
+      "",
+      "",
+      "",
+      headers
+    );
+    expect(register).toStrictEqual({
+      success: false,
+      message: "Invalid form data",
+      errors: [
+        {
+          message: "Email is required",
+        },
+        {
+          message: "Password is required",
+        },
+        {
+          message: "First Name is required",
+        },
+        {
+          message: "Last Name is required",
+        }
+      ],
+    });
+  })
+  test("Register - [should be able to register]", async () => {
+    const headers = {} as IncomingHttpHeaders;
+
+    const register = await service.register(
+      "jane",
+      "doe",
+      "jane@email.com",
+      "password1",
+      headers
+    );
+    
+    expect(register).toStrictEqual({
+      success: true,
+      message: "Successfully registered",
+      token: '0123',
+    });
+  });
+  test("Register -  [user already exist]", async () => {
+    const headers = {} as IncomingHttpHeaders;
+    const register = await service.register(
+      "john",
+      "doe",
+      "john@email.com",
+      "password1",
+      headers
+    );
+    expect(register).toStrictEqual({
+      success: false,
+      message: "Account already exist",
+    });
+  })
 });

@@ -22,19 +22,19 @@ export interface IAuthService {
   login(
     email: string,
     password: string,
-    fcmtoken?: string,
+    fcmtoken?: string
   ): Promise<{
-    success: boolean,
-    message: string,
+    success: boolean;
+    message: string;
     data?: {
       profile: {
-        firstName: string,
-        lastName: string,
-        fullName: string,
-        email: string,
-        avatar: string,
-      },
-    }
+        firstName: string;
+        lastName: string;
+        fullName: string;
+        email: string;
+        avatar: string;
+      };
+    };
   }>;
   verify(token: string): Promise<{
     success: boolean;
@@ -60,15 +60,15 @@ export const authServiceFactory: IAuthServiceFactory = {
           firstName,
           lastName,
           email,
-          password
-        })
-        
+          password,
+        });
+
         if (isValidData.length > 0) {
           return {
             success: false,
-            message: 'Invalid form data',
+            message: "Invalid form data",
             errors: isValidData,
-          }
+          };
         }
 
         const ALPHABET = "0123456789";
@@ -104,8 +104,8 @@ export const authServiceFactory: IAuthServiceFactory = {
         }
         return {
           success: true,
-          message: "successfully registered",
-          token: emailCode
+          message: "Successfully registered",
+          token: emailCode,
         };
       } catch (error) {
         console.log({ error });
@@ -116,73 +116,75 @@ export const authServiceFactory: IAuthServiceFactory = {
       }
     }
 
-
-    function validateRegisterInputData(payload: { email: string, password: string, firstName: string, lastName: string }) {
+    function validateRegisterInputData(payload: {
+      email: string;
+      password: string;
+      firstName: string;
+      lastName: string;
+    }) {
       const errors = [];
       if (!payload.email) {
-        errors.push({ 
-          message: "Email is required"
+        errors.push({
+          message: "Email is required",
         });
       }
       if (!payload.password) {
-        errors.push({ 
-          message: "Password is required"
-        })
+        errors.push({
+          message: "Password is required",
+        });
       }
       if (!payload.firstName) {
-        errors.push({ 
-          message: "First is required"
-        })
+        errors.push({
+          message: "First Name is required",
+        });
       }
       if (!payload.lastName) {
-        errors.push({ 
-          message: "Last Name is require"
-      })
+        errors.push({
+          message: "Last Name is required",
+        });
       }
-      return errors
+      return errors;
     }
 
-    function validateLoginInputData (payload: { email: string, password: string }) {
+    function validateLoginInputData(payload: {
+      email: string;
+      password: string;
+    }) {
       const errors = [];
       if (!payload.email) {
-        errors.push({ 
-          message: "Email is required"
+        errors.push({
+          message: "Email is required",
         });
       }
       if (typeof payload.email !== "string") {
-        errors.push({ 
-          message: "Email must be a string"
+        errors.push({
+          message: "Email must be a string",
         });
       }
       if (!payload.password) {
-        errors.push({ 
-          message: "Password is required"
-        })
+        errors.push({
+          message: "Password is required",
+        });
       }
       if (typeof payload.password !== "string") {
-        errors.push({ 
-          message: "Password must be a string"
-        })
+        errors.push({
+          message: "Password must be a string",
+        });
       }
-      return errors
+      return errors;
     }
-    async function login(
-      email: string,
-      password: string,
-      fcmtoken?: string,
-    ) {
+    async function login(email: string, password: string, fcmtoken?: string) {
       try {
-        // if email is provided fail
         const isValidData = validateLoginInputData({
           email,
-          password
-        })
+          password,
+        });
         if (isValidData.length > 0) {
           return {
             success: false,
             errors: isValidData,
-            message: 'Invalid form data',
-          }
+            message: "Invalid form data",
+          };
         }
 
         const user = await repositories.userRepository.findUser(email);
@@ -190,26 +192,31 @@ export const authServiceFactory: IAuthServiceFactory = {
         if (typeof user === "boolean") {
           return { success: false, message: "Could not find user" };
         }
-        
+
         const is_verified = user.verified;
         if (!is_verified) {
           return { success: false, message: "Not yet activated your account" };
         }
-        
+
         const checkHashedPassword =
           repositories.authenticationRepository.checkHashedPassword(
             password,
             user.password
           );
-        
+
         if (!checkHashedPassword) {
           return { success: false, message: "Username or password incorrect!" };
         }
 
-        const token = repositories.authenticationRepository.createToken(user.id);
-        
-        await repositories.authenticationRepository.updateFCMToken(user.id, fcmtoken);
-        
+        const token = repositories.authenticationRepository.createToken(
+          user.id
+        );
+
+        await repositories.authenticationRepository.updateFCMToken(
+          user.id,
+          fcmtoken
+        );
+
         return {
           success: true,
           message: "Successfully loggedIn",
@@ -238,7 +245,8 @@ export const authServiceFactory: IAuthServiceFactory = {
       message: string;
     }> {
       try {
-        const result = await repositories.authenticationRepository.verifyAccount(token);
+        const result =
+          await repositories.authenticationRepository.verifyAccount(token);
         if (!result) {
           return {
             success: false,
@@ -248,13 +256,13 @@ export const authServiceFactory: IAuthServiceFactory = {
         return {
           success: true,
           message: "Successfully verified",
-        }
+        };
       } catch (error) {
         console.log(error);
         return {
           success: false,
           message: "Something went wrong",
-        }
+        };
       }
     }
 
