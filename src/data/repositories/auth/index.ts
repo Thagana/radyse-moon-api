@@ -75,6 +75,14 @@ export const authServiceRepository: IAuthRepositoryFactory = {
 
     async function verifyAccount(token: string) {
       try {
+        const user = await User.findOne({
+          where: {
+            token: token,
+          },
+        })
+        if (!user) {
+          return false;
+        }
         await User.update(
           {
             verified: 1,

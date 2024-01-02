@@ -237,19 +237,25 @@ export const authServiceFactory: IAuthServiceFactory = {
       success: boolean;
       message: string;
     }> {
-      return new Promise<{ success: boolean; message: string }>(
-        (resolve, reject) => {
-          repositories.authenticationRepository
-            .verifyAccount(token)
-            .then(() => {
-              resolve({
-                success: true,
-                message: "Successfully verified",
-              });
-            })
-            .catch((error) => reject(error));
+      try {
+        const result = await repositories.authenticationRepository.verifyAccount(token);
+        if (!result) {
+          return {
+            success: false,
+            message: "Something went wrong",
+          };
         }
-      );
+        return {
+          success: true,
+          message: "Successfully verified",
+        }
+      } catch (error) {
+        console.log(error);
+        return {
+          success: false,
+          message: "Something went wrong",
+        }
+      }
     }
 
     return {
