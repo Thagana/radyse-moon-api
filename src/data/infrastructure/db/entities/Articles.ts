@@ -59,6 +59,7 @@ Article.init(
     dateCreated: {
       type: DataTypes.TEXT,
       allowNull: false,
+      defaultValue: DataTypes.NOW
     },
     author: {
       type: DataTypes.TEXT,

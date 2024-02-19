@@ -13,7 +13,7 @@ export class NewsRoutes {
     router.get("/headlines", (request: Request, response: Response) =>
       headlineHandler(service, request, response)
     );
-    router.post("/fetch-news", (request: Request, response: Response) =>
+    router.get("/fetch-news", (request: Request, response: Response) =>
       fetchNewsHandle(service, request, response)
     );
     router.get("/all-news", (request: Request, response: Response) =>
