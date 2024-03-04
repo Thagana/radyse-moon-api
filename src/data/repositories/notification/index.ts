@@ -92,7 +92,44 @@ export const notificationServiceRepository: INotificationRepositoryFactory = {
         })
       })
     }
+    async function sendResetPasswordNotification(email: string, token?: string, username?: string) {
+      try {
+        if (!token || !username) {
+          return;
+        }
+        const transporter = nodemailer.createTransport({
+          host: 'smtp.mail.yahoo.com',
+          port: 465,
+          service: 'yahoo',
+          secure: false,
+          auth: {
+            user: configs.MAIL_USER_NAME,
+            pass: configs.MAIL_PASSWORD,
+          },
+          debug: false,
+          logger: true,
+        });
+        const html = await ejs.renderFile(
+          path.join(__dirname, '../../../views/reset_password.ejs'),
+          {
+            token: token,
+            username: username
+          },
+          { async: true },
+        );
+        const options = {
+          from: configs.MAIL_USER_NAME,
+          to: email,
+          subject: 'Reset your password',
+          html: html,
+        };
+        await transporter.sendMail(options);
+      } catch (error) {
+        console.error(error);
+      }
+    }
     return {
+      sendResetPasswordNotification,
       getPushTokens,
       sendVerificationNotification,
       sendCropPushNotification

@@ -29,7 +29,7 @@ export const authServiceRepository: IAuthRepositoryFactory = {
       return new Promise<User | boolean>((resolve, reject) => {
         User.findOne({
           where: {
-            token: code,
+            verificationToken: code,
           },
         })
           .then((user) => {
@@ -77,7 +77,7 @@ export const authServiceRepository: IAuthRepositoryFactory = {
       try {
         const user = await User.findOne({
           where: {
-            token: token,
+            verificationToken: token,
           },
         })
         if (!user) {
@@ -89,7 +89,7 @@ export const authServiceRepository: IAuthRepositoryFactory = {
           },
           {
             where: {
-              token: token,
+              verificationToken: token,
             },
           }
         );
