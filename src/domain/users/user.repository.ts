@@ -28,4 +28,6 @@ export interface IUsersRepository {
   }>;
   getUsers(): Promise<User[]>;
   getPushTokens(users: {userId: number}[]): Promise<string[]>;
+  updateForgotPasswordCode(code: string, email: string): Promise<boolean>;
+  updatePassword(email: string, password: string): Promise<boolean>;
 }

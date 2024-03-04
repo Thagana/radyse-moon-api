@@ -9,6 +9,7 @@ export interface INotificationService {
     token: string | undefined
   ): Promise<void>;
   sendCronFetchedArticlesNotification(fetched: Article[]): Promise<void>;
+  sendResetPasswordNotification(email: string, token?: string, username?: string): Promise<void>;
 }
 
 export interface INotificationServiceFactory {
@@ -62,7 +63,23 @@ export const notificationServiceFactory: INotificationServiceFactory = {
       }
     }
 
+    async function sendResetPasswordNotification(
+      email: string,
+      token: string,
+      username: string
+    ) {
+      try {
+        await repository.notificationRepository.sendResetPasswordNotification(
+          email,
+          token,
+          username
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    }
     return {
+      sendResetPasswordNotification,
       sendVerificationNotification,
       sendCronFetchedArticlesNotification,
     };

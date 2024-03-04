@@ -4,29 +4,31 @@ import config from '../../../../configs/db.configs';
 
 interface UserAttributes {
   id: number;
-  first_name: string;
-  last_name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   avatar: string;
-  token: string;
+  verificationToken: string;
+  forgotPasswordToken: string;
   password: string;
   verified: number;
 }
 
-type UserCreationAttributes = Optional<UserAttributes, "id" | "verified">;
+type UserCreationAttributes = Optional<UserAttributes, "id" | "verified" | "verificationToken" | "forgotPasswordToken">;
 
 class User
   extends Model<UserAttributes, UserCreationAttributes>
   implements UserAttributes
 {
   public id!: number;
-  public first_name!: string;
-  public last_name!: string;
+  public firstName!: string;
+  public lastName!: string;
   public email!: string;
   public avatar!: string;
   public password!: string;
   public verified!: number;
-  public token!: string;
+  public verificationToken!: string;
+  public forgotPasswordToken!: string;
 }
 
 User.init(
@@ -37,11 +39,11 @@ User.init(
       autoIncrement: true,
       allowNull: false,
     },
-    first_name: {
+    firstName: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    last_name: {
+    lastName: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -63,10 +65,14 @@ User.init(
       allowNull: false,
       defaultValue: 0,
     },
-    token: {
+    verificationToken: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
+    forgotPasswordToken: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    }
   },
   {
     tableName: "users",

@@ -33,9 +33,9 @@ export const userServiceRepository: IUsersRepositoryFactory = {
           // CREATE USER
           const user = await User.create({
             email: email,
-            token: emailCode,
-            first_name: firstName,
-            last_name: lastName,
+            verificationToken: emailCode,
+            firstName: firstName,
+            lastName: lastName,
             password: hashPassword,
             avatar:
               "https://avatars.githubusercontent.com/u/68122202?s=400&u=4abc9827a8ca8b9c19b06b9c5c7643c87da51e10&v=4",
@@ -112,13 +112,6 @@ export const userServiceRepository: IUsersRepositoryFactory = {
       });
     }
 
-    /**
-     *
-     * @param token
-     * @param user
-     * @param title
-     * @returns
-     */
     async function updatePushToken(token: string, user: User, title: string) {
       return new Promise<boolean>(async (resolve, reject) => {
         try {
@@ -212,7 +205,52 @@ export const userServiceRepository: IUsersRepositoryFactory = {
         })
       })
     }
+
+    async function updatePassword(token: string, hashedPassword: string): Promise<boolean> {
+      return new Promise<boolean>((reject, resolve) => {
+        User.findOne({
+          where: {
+            forgotPasswordToken: token
+          }
+        }).then((user) => {
+          if (user) {
+            User.update({
+              password: hashedPassword
+            }, {
+              where: {
+                id: user.id
+              }
+            }).then(() => {
+              resolve(true)
+            }).catch((error) => {
+              reject(error)
+            })
+          }
+        }).catch((error) => {
+          reject(error)
+        })
+      })
+    }
+
+    async function updateForgotPasswordCode(code: string, email: string): Promise<boolean> {
+      return new Promise<boolean>((resolve, reject) => {
+        User.update({
+          forgotPasswordToken: code
+        }, {
+          where: {
+            email
+          }
+        }).then(() => {
+          resolve(true)
+        }).catch((error) => {
+          reject(error)
+        })
+      })
+    }
+
     return {
+      updateForgotPasswordCode,
+      updatePassword,
       getPushTokens,
       getUsers,
       updateToken,
