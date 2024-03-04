@@ -40,6 +40,19 @@ export interface IAuthService {
     success: boolean;
     message: string;
   }>;
+  forgotPasswordRequest(email: string): Promise<{
+    success: boolean;
+    message: string;
+    data?: {
+      token: string;
+      email: string;
+      username: string;
+    }
+  }>;
+  resetPassword(token: string, password: string): Promise<{
+    success: boolean;
+    message: string;
+  }>;
 }
 
 interface IAuthServiceFactory {
@@ -223,9 +236,9 @@ export const authServiceFactory: IAuthServiceFactory = {
           data: {
             token,
             profile: {
-              firstName: user.first_name,
-              lastName: user.last_name,
-              fullName: `${user.first_name} ${user.last_name}`,
+              firstName: user.firstName,
+              lastName: user.lastName,
+              fullName: `${user.firstName} ${user.lastName}`,
               email: user.email,
               avatar: user.avatar,
             },
@@ -266,7 +279,84 @@ export const authServiceFactory: IAuthServiceFactory = {
       }
     }
 
+    async function forgotPasswordRequest(email: string): Promise<{
+      success: boolean;
+      message: string;
+      data?: {
+        token: string;
+        email: string;
+        username: string;
+      }
+    }> {
+      try {
+        const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+        const user = await repositories.userRepository.findUser(email);
+        if (typeof user == 'boolean') {
+          return {
+            success: false,
+            message: "User not found",
+          }
+        }
+        const result =
+          await repositories.userRepository.updateForgotPasswordCode(
+            verificationCode,
+            email,
+          );
+        if (!result) {
+          return {
+            success: false,
+            message: "Something went wrong",
+          };
+        }
+        return {
+          success: true,
+          message: "Successfully sent",
+          data: {
+            token: verificationCode,
+            username: `${user.firstName} ${user.lastName}`,
+            email,
+          }
+        };
+      } catch (error) {
+        console.log(error);
+        return {
+          success: false,
+          message: "Something went wrong",
+        };
+      }
+    }
+    async function resetPassword(
+      token: string,
+      password: string
+    ) {
+      try {
+        const hashedPassword = await repositories.authenticationRepository.hashPassword(
+          10,
+          password
+        )
+        const result =
+          await repositories.userRepository.updatePassword(token, hashedPassword);
+        if (!result) {
+          return {
+            success: false,
+            message: "Something went wrong",
+          };
+        }
+        return {
+          success: true,
+          message: "Successfully updated",
+        };
+      } catch (error) {
+        console.log(error);
+        return {
+          success: false,
+          message: "Something went wrong",
+        };
+      }
+    }
     return {
+      forgotPasswordRequest,
+      resetPassword,
       verify,
       register,
       login,
