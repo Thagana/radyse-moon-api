@@ -21,6 +21,7 @@ const userMockDb = [
     1,
     "token",
     "https://images.com",
+    "https://images.com",
     "token"
   ),
   new User(
@@ -30,6 +31,7 @@ const userMockDb = [
     "james@email.com",
     0,
     "token",
+    "https://images.com",
     "https://images.com",
     "token"
   ),
@@ -101,10 +103,10 @@ const userRepo: IUsersRepository = {
     });
   },
   updateToken(token: string, user: User) {
-    return new Promise<boolean>((resolve, reject) => {});
+    return new Promise<boolean>((resolve, reject) => { });
   },
   updatePushToken(token: string, user: User, title: string) {
-    return new Promise<boolean>((resolve, reject) => {});
+    return new Promise<boolean>((resolve, reject) => { });
   },
   getSettings(id: number) {
     return new Promise<{
@@ -134,11 +136,19 @@ const userRepo: IUsersRepository = {
       resolve([]);
     });
   },
-  getPushTokens(users: { userId: number }[]) {
+  getPushTokens(users: { userId: number; }[]) {
     return new Promise<string[]>((resolve, reject) => {
       resolve([]);
     });
   },
+  updateForgotPasswordCode() {
+    return new Promise<boolean>((resolve, reject) => {
+      resolve(true);
+    });
+  },
+  updatePassword: function (email: string, password: string): Promise<boolean> {
+    throw new Error("Function not implemented.");
+  }
 };
 
 const newsRepo: INewsRepository = {
@@ -187,6 +197,9 @@ const notificationRepo: INotificationRepository = {
     data: { title: string; description: string }[],
     pushTokens: string[]
   ) {
+    return new Promise<void>((resolve, reject) => {});
+  },
+  sendResetPasswordNotification(email: string, token: string, username: string) {
     return new Promise<void>((resolve, reject) => {});
   },
 };
