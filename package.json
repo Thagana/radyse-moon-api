@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon --exec ts-node src/server.ts",
     "build": "tsc --outDir build",
-    "start": "node ./build/server.js",
+    "start": "cd build && node server.js",
     "lint": "eslint .",
     "test": "vitest"
   },
