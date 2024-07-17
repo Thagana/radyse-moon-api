@@ -207,29 +207,27 @@ export const userServiceRepository: IUsersRepositoryFactory = {
     }
 
     async function updatePassword(token: string, hashedPassword: string): Promise<boolean> {
-      return new Promise<boolean>((reject, resolve) => {
-        User.findOne({
+      try {
+        const user = await User.findOne({
           where: {
             forgotPasswordToken: token
           }
-        }).then((user) => {
-          if (user) {
-            User.update({
-              password: hashedPassword
-            }, {
-              where: {
-                id: user.id
-              }
-            }).then(() => {
-              resolve(true)
-            }).catch((error) => {
-              reject(error)
-            })
-          }
-        }).catch((error) => {
-          reject(error)
         })
-      })
+        if (!user) {
+          return false;
+        }
+        await User.update({
+          password: hashedPassword
+        }, {
+          where: {
+            id: user.id
+          }
+        })
+        return true;
+      } catch (error) {
+        console.error(error);
+        return false;
+      }
     }
 
     async function updateForgotPasswordCode(code: string, email: string): Promise<boolean> {
