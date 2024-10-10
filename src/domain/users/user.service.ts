@@ -1,4 +1,6 @@
+import { bool } from './../../../../radyse-moon-app/node_modules/@types/prop-types/index.d';
 import { IRepositories } from "./../../interface/IRepository";
+import { User } from "./model";
 export interface IUserService {
   getSettings(id: number): Promise<{
     language: string;
@@ -9,6 +11,12 @@ export interface IUserService {
     email_notification: number;
     web_push_notification: number;
     sms_notification: number;
+  }>;
+  savePushToken(token: string, userId: number): Promise<boolean>;
+  getProfile(userId: number): Promise<{
+    success: boolean;
+    data?: User,
+    message?: string
   }>;
 }
 
@@ -35,8 +43,32 @@ export const userServiceFactory = {
         };
       }
     }
+    async function savePushToken(token: string, userId: number) {
+      try {
+        await repository.userRepository.savePushToken(token, userId);
+        return true;
+      } catch (error) {
+        return false;
+      }
+    }
+    async function getProfile(userId: number) {
+      try {
+        const profile = await repository.userRepository.getProfile(userId);
+        return {
+          success: true,
+          data: profile
+        };
+      } catch (error) {
+        return {
+          success: false,
+          message: "Something went wrong please try again later",
+        }
+      }
+    }
     return {
       getSettings,
+      savePushToken,
+      getProfile
     };
   },
 };

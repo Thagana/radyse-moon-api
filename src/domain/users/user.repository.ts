@@ -30,4 +30,6 @@ export interface IUsersRepository {
   getPushTokens(users: {userId: number}[]): Promise<string[]>;
   updateForgotPasswordCode(code: string, email: string): Promise<boolean>;
   updatePassword(email: string, password: string): Promise<boolean>;
+  savePushToken(token: string, userId: number): Promise<boolean>;
+  getProfile(userId: number): Promise<User>;
 }

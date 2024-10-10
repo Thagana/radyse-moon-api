@@ -245,7 +245,50 @@ export const userServiceRepository: IUsersRepositoryFactory = {
         })
       })
     }
-
+    async function savePushToken(token: string, userId: number) {
+      try {
+        const oldToken = await PushTokens.findOne({
+          where: {
+            userId
+          }
+        })
+        if (oldToken) {
+          await PushTokens.update({
+            token
+          }, {
+            where: {
+              userId
+            }
+          })
+        } else {
+          await PushTokens.create({
+            token,
+            userId,
+            title: 'PUSH_TOKEN'
+          })
+        }
+        return true;
+      } catch (error) {
+        return false;
+      }
+    }
+    async function getProfile(userId: number) {
+      return new Promise<User>((resolve, reject) => {
+        User.findOne({
+          where: {
+            id: userId
+          }
+        }).then((response) => {
+          if (response) {
+            resolve(response);
+          } else {
+            reject(new Error('User not found'))
+          }
+        }).catch((error) => {
+          reject(error)
+        })
+      })
+    }
     return {
       updateForgotPasswordCode,
       updatePassword,
@@ -256,6 +299,8 @@ export const userServiceRepository: IUsersRepositoryFactory = {
       createUser,
       getSettings,
       updatePushToken,
+      savePushToken,
+      getProfile,
     };
   },
 };
