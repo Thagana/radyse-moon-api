@@ -339,7 +339,7 @@ export const authServiceFactory: IAuthServiceFactory = {
         if (!result) {
           return {
             success: false,
-            message: "Something went wrong",
+            message: "Something went wrong, failed to update password",
           };
         }
         return {
@@ -347,10 +347,10 @@ export const authServiceFactory: IAuthServiceFactory = {
           message: "Successfully updated",
         };
       } catch (error) {
-        console.log(error);
+        console.error(error);
         return {
           success: false,
-          message: "Something went wrong",
+          message: "Something went wrong, please try again later",
         };
       }
     }

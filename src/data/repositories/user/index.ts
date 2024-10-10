@@ -207,29 +207,27 @@ export const userServiceRepository: IUsersRepositoryFactory = {
     }
 
     async function updatePassword(token: string, hashedPassword: string): Promise<boolean> {
-      return new Promise<boolean>((reject, resolve) => {
-        User.findOne({
+      try {
+        const user = await User.findOne({
           where: {
             forgotPasswordToken: token
           }
-        }).then((user) => {
-          if (user) {
-            User.update({
-              password: hashedPassword
-            }, {
-              where: {
-                id: user.id
-              }
-            }).then(() => {
-              resolve(true)
-            }).catch((error) => {
-              reject(error)
-            })
-          }
-        }).catch((error) => {
-          reject(error)
         })
-      })
+        if (!user) {
+          return false;
+        }
+        await User.update({
+          password: hashedPassword
+        }, {
+          where: {
+            id: user.id
+          }
+        })
+        return true;
+      } catch (error) {
+        console.error(error);
+        return false;
+      }
     }
 
     async function updateForgotPasswordCode(code: string, email: string): Promise<boolean> {
@@ -247,7 +245,50 @@ export const userServiceRepository: IUsersRepositoryFactory = {
         })
       })
     }
-
+    async function savePushToken(token: string, userId: number) {
+      try {
+        const oldToken = await PushTokens.findOne({
+          where: {
+            userId
+          }
+        })
+        if (oldToken) {
+          await PushTokens.update({
+            token
+          }, {
+            where: {
+              userId
+            }
+          })
+        } else {
+          await PushTokens.create({
+            token,
+            userId,
+            title: 'PUSH_TOKEN'
+          })
+        }
+        return true;
+      } catch (error) {
+        return false;
+      }
+    }
+    async function getProfile(userId: number) {
+      return new Promise<User>((resolve, reject) => {
+        User.findOne({
+          where: {
+            id: userId
+          }
+        }).then((response) => {
+          if (response) {
+            resolve(response);
+          } else {
+            reject(new Error('User not found'))
+          }
+        }).catch((error) => {
+          reject(error)
+        })
+      })
+    }
     return {
       updateForgotPasswordCode,
       updatePassword,
@@ -258,6 +299,8 @@ export const userServiceRepository: IUsersRepositoryFactory = {
       createUser,
       getSettings,
       updatePushToken,
+      savePushToken,
+      getProfile,
     };
   },
 };
